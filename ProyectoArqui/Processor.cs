@@ -5,7 +5,14 @@ namespace ProyectoArqui {
 
     public class Processor {
 
-        public class Core { }
+        public class Core { 
+            public struct InstructionCache {
+            }
+            public struct DataCache {                
+            } 
+        }
+
+        public class SharedMemory { }
 
         public class InstructionMemory {
         //Attributes
@@ -52,13 +59,18 @@ namespace ProyectoArqui {
     }
         
         public InstructionMemory isntrmem;
-        public ShrdMem shrdMem;
-
+        public SharedMemory sharedMemory;
+        private int id; // processor id
         public static Core[] cores;
 
-        public Processor(int n_cores, int isntrmem_size) {
+        public Processor(int _id, int n_cores, int isntrmem_size) {
+            id = _id;
             cores = new Core[n_cores];
             isntrmem = new InstructionMemory(isntrmem_size);
+        }
+
+        public void start () {
+            Console.WriteLine("hola desde proc "+id);
         }
 
         //Methods
