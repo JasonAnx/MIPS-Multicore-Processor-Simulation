@@ -153,4 +153,21 @@ namespace ProyectoArqui {
             //Console.WriteLine(memoria.getBloque(5).word0.operation);
         }
     }
+
+    class Directorio
+    {
+
+        // Construye las dos matrices según la cantidad de bloques y caches ingresados
+        // Lleva dos matrices:
+        // - Una es de dimensiones 2 x cantBloques, lleva en cada fila la etiqueta del bloque y su estado
+        // - Otra es de dimensiones cantidadCaches x cantBloques, lleva en cada fila 
+        public Directorio(int cantidadBloques, int cantidadCaches)
+        {
+            matrizBloqueEstado = new string[2, cantidadBloques];
+            matrizCaches = new Boolean[cantidadCaches, cantidadBloques];
+        }
+
+        string[,] matrizBloqueEstado;
+        Boolean[,] matrizCaches;
+    }
 }
