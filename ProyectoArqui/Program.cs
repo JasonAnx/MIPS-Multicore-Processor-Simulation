@@ -1,26 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
-//Imports que importan
 using System.IO;
 
-namespace WpfApp1
+
+namespace ProyectoArqui
 {
-    /// <summary>
-    /// Lógica de interacción para MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    class Program
     {
         public struct Instruction
         {
@@ -37,7 +21,8 @@ namespace WpfApp1
                 operator2 = subI4;
             }
 
-            public void setValues(Instruction instr) {
+            public void setValues(Instruction instr)
+            {
                 operation = instr.operation;
                 result = instr.result;
                 operator1 = instr.operator1;
@@ -107,7 +92,8 @@ namespace WpfApp1
 
             }
 
-            public Bloque getBloque(int indexBloque) {
+            public Bloque getBloque(int indexBloque)
+            {
                 return mem[indexBloque];
             }
 
@@ -123,32 +109,25 @@ namespace WpfApp1
         }
 
         LocalMem memoria = new LocalMem(24);
-        public MainWindow()
+        static void Main(string[] args)
         {
-            InitializeComponent();
             allocateInstInMem();
-
         }
 
         public void allocateInstInMem()
         {
             string filePath = @"C:\Users\Esteban\Downloads\0.txt";
             string[] lines = File.ReadAllLines(filePath);
-            for (int line = 0; line < lines.Length; line++) {
+            for (int line = 0; line < lines.Length; line++)
+            {
                 string[] instructionParts = lines[line].Split(' ');
-                Instruction inst = new Instruction( int.Parse(instructionParts[0]), 
+                Instruction inst = new Instruction(int.Parse(instructionParts[0]),
                                                     int.Parse(instructionParts[1]),
-                                                    int.Parse(instructionParts[2]), 
+                                                    int.Parse(instructionParts[2]),
                                                     int.Parse(instructionParts[3]));
                 memoria.insertInstr(inst);
             }
-            
-           // string instruction = File.ReadLines(filePath).Skip(instNum - 1).Take(1).First();
-           // string[] instructionParts = instruction.Split(' ');
-           //Instruction inst = new Instruction(int.Parse(instructionParts[0]), int.Parse(instructionParts[1]),
-           //     int.Parse(instructionParts[2]), int.Parse(instructionParts[3]));
             Console.WriteLine(memoria.getBloque(5).word0.operation);
-            
         }
     }
 }
