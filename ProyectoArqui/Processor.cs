@@ -40,8 +40,54 @@ namespace ProyectoArqui {
             private int _coreId;
             Processor parent;
             public struct InstructionCache {
+                Instruction[] instrsInCache;
+                int[] labelsOfInstrs;
+
+                public InstructionCache(int cacheSize) {
+                    instrsInCache = new Instruction[cacheSize];
+                    labelsOfInstrs = new int[cacheSize];
+                    /* 
+                       Inicializa las 4 Instrucciones (16 enteros) con 0s.
+                       Inicializa las etiquetas de las 4 Instrucciones en direcciones no existentes (-1).
+                     */
+                    for (int i = 0; i < cacheSize; i++)
+                    {
+                        instrsInCache[i].operationCod = 0;
+                        instrsInCache[i].argument1 = 0;
+                        instrsInCache[i].argument2 = 0;
+                        instrsInCache[i].argument3 = 0;
+                        labelsOfInstrs[i] = -1;
+                    }
+
+                }
             }
+        
             public struct DataCache {
+                enum states { shared, invalid, modified }
+                Instruction[] instrsInCache;
+                int [] labelsOfInstrs;
+                states [] statesOfInstrs;
+
+                public DataCache(int cacheSize) {
+                    instrsInCache = new Instruction[cacheSize];
+                    labelsOfInstrs = new int[cacheSize];
+                    statesOfInstrs = new states[cacheSize];
+                    /* 
+                       Inicializa las 4 Instrucciones (16 enteros) con 0s.
+                       Inicializa los estados de las 4 Instrucciones en Invalidos (I).
+                       Inicializa las etiquetas de las 4 Instrucciones en direcciones no existentes (-1).
+                     */
+                    for (int i = 0; i < cacheSize; i++)
+                    {
+                        instrsInCache[i].operationCod = 0;
+                        instrsInCache[i].argument1    = 0;
+                        instrsInCache[i].argument2    = 0;
+                        instrsInCache[i].argument3    = 0;
+                        statesOfInstrs[i] = states.invalid;
+                        labelsOfInstrs[i] = -1;
+                    }
+                }
+
             }
             public Core(int _id, Processor prnt ) {
                 _coreId = _id;
