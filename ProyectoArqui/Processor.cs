@@ -66,11 +66,13 @@ namespace ProyectoArqui {
         public SharedMemory sharedMemory;
         private int id; // processor id
         public static Core[] cores;
+        int[] registers;
 
         public Processor(int _id, int n_cores, int isntrmem_size) {
             id = _id;
             cores = new Core[n_cores];
             isntrmem = new InstructionMemory(isntrmem_size);
+            registers = new int[32];
         }
 
         public void start () {
@@ -78,8 +80,5 @@ namespace ProyectoArqui {
         }
 
         //Methods
-
-        //
-        
     }
 }

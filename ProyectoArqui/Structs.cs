@@ -39,4 +39,18 @@ namespace ProyectoArqui {
         }
     }
 
+    /*
+    public struct Context{
+        int threadId;
+        float threadExecutionTime;
+        // Un vector con los valores actuales de los registros del hilo
+        int[] currentRegisterValues;
+
+        public Context(){
+            
+        }
+    }
+    */
+
+
 }
