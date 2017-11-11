@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
 
 
 namespace ProyectoArqui {
@@ -20,22 +19,20 @@ namespace ProyectoArqui {
             processors[1] = new Processor( /*id*/ 1,/*n_cores*/ 1, /*instmem_size*/ 16);
             cargarDatos();
             execute();
+            var name = Console.ReadLine();
         }
 
         public static void cargarDatos() {
             Console.Write("inicio\n");
 
             OS.allocateInstInMem();
-            Console.Write("C'est bien. Presione asfd para contiuar lmao\n");
-            var name = Console.ReadLine();
         }
 
         public static void execute() {
             // inicia los hilos
             foreach (Processor p in processors) {
                 // cambiar a thread por core, no por procsador
-                Thread t = new Thread(new ThreadStart(p.start));
-                t.Start();
+                p.start();
             }
             // barrera.SignalAndWait();
             Console.WriteLine("Simulacion finalizada. ");
