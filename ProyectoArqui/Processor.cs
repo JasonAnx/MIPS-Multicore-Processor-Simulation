@@ -30,19 +30,19 @@ namespace ProyectoArqui {
         //Methods
         public void insertInstr(Instruction instr) {
             if (lastInstr == 0) {
-                mem[lastBlock].word0.setValues(instr);
+                mem[lastBlock].word[0].setValue(instr);
                 lastInstr++;
             }
             if (lastInstr == 1) {
-                mem[lastBlock].word1.setValues(instr);
+                mem[lastBlock].word[1].setValue(instr);
                 lastInstr++;
             }
             if (lastInstr == 2) {
-                mem[lastBlock].word2.setValues(instr);
+                mem[lastBlock].word[2].setValue(instr);
                 lastInstr++;
             }
             if (lastInstr == 3) {
-                mem[lastBlock].word3.setValues(instr);
+                mem[lastBlock].word[3].setValue(instr);
                 lastInstr = 0;
                 if (lastBlock < mem.Length)
                     lastBlock++;

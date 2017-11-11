@@ -1,38 +1,41 @@
 namespace ProyectoArqui {
 
-    public struct Bloque {
-        public Instruction word0;
-        public Instruction word1;
-        public Instruction word2;
-        public Instruction word3;
+    public struct Bloque
+    {
+        public Instruction[] word;
 
-        public Bloque(Instruction w0, Instruction w1,
-                     Instruction w2, Instruction w3) {
-            word0 = w0;
-            word1 = w1;
-            word2 = w2;
-            word3 = w3;
+        public Bloque(int wordSize)
+        {
+            word = new Instruction[wordSize];
+        }
+
+        public Instruction GetInstruction(int numInstr)
+        {
+            return this.word[numInstr];
         }
     }
 
-    public struct Instruction {
-        public int operation;
-        public int result;
-        public int operator1;
-        public int operator2;
+    public struct Instruction
+    {
+        public int operationCod;
+        public int argument1;
+        public int argument2;
+        public int argument3;
 
-        public Instruction(int subI1, int subI2, int subI3, int subI4) {
-            operation = subI1;
-            result = subI2;
-            operator1 = subI3;
-            operator2 = subI4;
+        public Instruction(int subI1, int subI2, int subI3, int subI4)
+        {
+            operationCod = subI1;
+            argument1 = subI2;
+            argument2 = subI3;
+            argument3 = subI4;
         }
 
-        public void setValues(Instruction instr) {
-            operation = instr.operation;
-            result = instr.result;
-            operator1 = instr.operator1;
-            operator2 = instr.operator2;
+        public void setValue(Instruction instr)
+        {
+            operationCod = instr.operationCod;
+            argument1 = instr.argument1;
+            argument2 = instr.argument2;
+            argument3 = instr.argument3;
         }
     }
 
