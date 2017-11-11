@@ -23,7 +23,11 @@ namespace ProyectoArqui {
         //Constructor
         public InstructionMemory(int sizeMem) {
             mem = new Bloque[sizeMem];
-            lastBlock = 0;
+                for (int i = 0; i < sizeMem; i++)
+                {
+                    mem[i] = new Bloque(4);
+                }
+                lastBlock = 0;
             lastInstr = 0;
         }
 
