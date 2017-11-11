@@ -14,13 +14,15 @@ namespace ProyectoArqui {
         public SharedMemory sharedMemory;
         private int id; // processor id
         public Core[] cores;
+        public int[] registers;
 
         // constructor
-        public Processor(int _id, int n_cores, int isntrmem_size) {
+        public Processor(int _id, int n_cores, int isntrmem_size)
+        {
             id = _id;
             cores = new Core[n_cores];
-            //Console.WriteLine("creado procesador " + id + "con  " + n_cores + "cores");
             isntrmem = new InstructionMemory(isntrmem_size);
+            registers = new int[32];
         }
 
         //Methods
@@ -140,12 +142,17 @@ namespace ProyectoArqui {
                         Environment.Exit(0);
                 }
 
-            }
+            }       
+        /*
 
-            public Bloque getBloque(int indexBloque) {
-                return mem[indexBloque];
-            }
+        public Bloque getBloque(int indexBloque) {
+            return mem[indexBloque];
 
         }
+        */
+
+        }
+
+        //Methods
     }
 }
