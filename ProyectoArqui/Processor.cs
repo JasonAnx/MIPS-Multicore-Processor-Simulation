@@ -99,8 +99,8 @@ namespace ProyectoArqui {
         public class InstructionMemory {
             //Attributes
             Bloque[] mem;
-            int lastBlock;
-            int lastInstr;
+            public int lastBlock;
+            public int lastInstr;
 
             //Constructor
             public InstructionMemory(int sizeMem) {
@@ -114,27 +114,15 @@ namespace ProyectoArqui {
 
             //Methods
             public void insertInstr(Instruction instr) {
-                if (lastInstr == 0) {
-                    mem[lastBlock].word[0].setValue(instr);
-                    lastInstr++;
-                }
-                if (lastInstr == 1) {
-                    mem[lastBlock].word[1].setValue(instr);
-                    lastInstr++;
-                }
-                if (lastInstr == 2) {
-                    mem[lastBlock].word[2].setValue(instr);
-                    lastInstr++;
-                }
-                if (lastInstr == 3) {
-                    mem[lastBlock].word[3].setValue(instr);
+                if (lastInstr > 3)
+                {
                     lastInstr = 0;
-                    if (lastBlock < mem.Length)
-                        lastBlock++;
-                    else
+                    lastBlock++;
+                    if (lastBlock > mem.Length)
                         Environment.Exit(0);
                 }
-
+                mem[lastBlock].word[lastInstr].setValue(instr);
+                lastInstr++;
             }
             /*
 
