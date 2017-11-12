@@ -141,6 +141,7 @@ namespace ProyectoArqui {
             // we used a partial class to define the class methods on another
             // file and so, keep this file shorter and more readable
             private int _coreId;
+            public int getId() { return _coreId; }
             Processor parent;
             public int[] registers;
 

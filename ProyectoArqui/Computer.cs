@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+using System.Collections;
 
 namespace ProyectoArqui {
 
@@ -16,6 +17,8 @@ namespace ProyectoArqui {
         /* public atr */
         public static Processor[] processors;
         public static Barrier bsync;
+
+        /************************** MAIN **************************/
 
         [STAThread]
         static void Main(string[] args) {
@@ -41,6 +44,8 @@ namespace ProyectoArqui {
             execute();
             var name = Console.ReadLine();
         }
+
+        /************************** MAIN **************************/
 
         public static void checkBarrierIntegrity() {
             if (bsync == null) Environment.Exit(10);
@@ -73,9 +78,11 @@ namespace ProyectoArqui {
 
     }
 
-    class OperatingSystem {
+    class OperatingSystem
+    {
 
-        public void allocateInstInMem() {
+        public void allocateInstInMem()
+        {
             for (int numProcessor = 0; numProcessor < 2; numProcessor++)
             {
                 string folderPath = "p" + numProcessor;
@@ -97,11 +104,12 @@ namespace ProyectoArqui {
                             {
                                 Computer.processors[numProcessor].isntrmem.insertInstr(inst);
                             }
-                            catch {
-                                logError("Unable to insert instruction "+inst.printValue()+
-                                          " on instruction memory of processor "+ numProcessor);
+                            catch
+                            {
+                                logError("Unable to insert instruction " + inst.printValue() +
+                                          " on instruction memory of processor " + numProcessor);
                             }
-                           
+
 
                         }
                         //Console.WriteLine(memoria.getBloque(5).word0.operation);
@@ -116,16 +124,34 @@ namespace ProyectoArqui {
                 }
             }
         }
-        public static void log(string s) {
+        public static void log(string s)
+        {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("[OS Message]: " + s);
             Console.ResetColor();
         }
-        public static void logError(string s) {
+        public static void logError(string s)
+        {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("[OS Message]: " + s);
             Console.ResetColor();
         }
+
+        // Create a new Context struct, save current context and insert it in the contextQueue
+
+        public void saveCurrentContext(Processor.Core currentCore)
+        {
+            int currentThreadId = currentCore.getId();
+            int[] currentRegisterValues = currentCore.registers;
+            // Todavía esto no se mide
+            float currentThreadExecutionTime = 0;
+            bool threadIsFinalized = false;
+
+            Context currentContext = new Context(currentThreadId, currentThreadExecutionTime, currentRegisterValues, threadIsFinalized);
+            contextQueue.Enqueue(currentContext);
+        }
+
+        public Queue contextQueue;
     }
 
     class Directory {
