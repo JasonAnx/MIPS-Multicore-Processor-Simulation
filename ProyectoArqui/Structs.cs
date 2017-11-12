@@ -64,18 +64,21 @@ namespace ProyectoArqui {
         }
     }
 
-    /*
+
     public struct Context{
         int threadId;
         float threadExecutionTime;
-        // Un vector con los valores actuales de los registros del hilo
+        // Current thread register values 
         int[] currentRegisterValues;
-
-        public Context(){
-            
+        bool threadIsFinalized;
+        public Context(int threadId, float threadExecutionTime, int[] currentRegisterValues, bool threadIsFinalized){
+            this.threadId = threadId;
+            this.threadExecutionTime = threadExecutionTime;
+            this.currentRegisterValues = currentRegisterValues;
+            this.threadIsFinalized = threadIsFinalized;
         }
     }
-    */
+
 
 
 }
