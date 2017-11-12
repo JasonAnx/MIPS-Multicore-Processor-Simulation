@@ -19,7 +19,7 @@ namespace ProyectoArqui {
 
         [STAThread]
         static void Main(string[] args) {
-            log("Started.");
+            OperatingSystem.log("Started.");
             processors = new Processor[2];
 
             processors[0] = new Processor( /*id*/ 0,/*n_cores*/ 2, /*instmem_size*/ 24);
@@ -49,11 +49,6 @@ namespace ProyectoArqui {
             }
         }
 
-        public static void log(string s) {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("[Computer Message]: " + s);
-            Console.ResetColor();
-        }
 
         public static int getGlobalCoreCount() {
             int totalCores = 0;
@@ -82,11 +77,9 @@ namespace ProyectoArqui {
 
         public void allocateInstInMem() {
             string filePath = "0.txt";
-            try
-            {
+            try {
                 string[] lines = File.ReadAllLines(filePath);
-                for (int line = 0; line < lines.Length; line++)
-                {
+                for (int line = 0; line < lines.Length; line++) {
                     string[] instructionParts = lines[line].Split(' ');
                     Instruction inst = new Instruction(int.Parse(instructionParts[0]),
                                                         int.Parse(instructionParts[1]),
@@ -97,10 +90,22 @@ namespace ProyectoArqui {
                 }
                 //Console.WriteLine(memoria.getBloque(5).word0.operation);
             }
-            catch (Exception e)
-            {
-                Console.WriteLine("An error occurred: '{0}'", e);
+            catch (FileNotFoundException e) {
+                logError("File not found: " + filePath);
+                logError("Could not load program");
+                Environment.Exit(10);
+                //Console.WriteLine("An error occurred: '{0}'", e);
             }
+        }
+        public static void log(string s) {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("[OS Message]: " + s);
+            Console.ResetColor();
+        }
+        public static void logError(string s) {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("[OS Message]: " + s);
+            Console.ResetColor();
         }
     }
 
