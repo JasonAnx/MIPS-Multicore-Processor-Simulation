@@ -28,6 +28,7 @@ namespace ProyectoArqui {
                 this.word[i].setValue(bl.word[i]);
             }
         }
+
     }
 
     public struct Instruction
@@ -51,6 +52,15 @@ namespace ProyectoArqui {
             argument1 = instr.argument1;
             argument2 = instr.argument2;
             argument3 = instr.argument3;
+        }
+
+        public string printValue()
+        {
+            string values = operationCod.ToString()+" ";
+            values += argument1.ToString()+ " ";
+            values += argument2.ToString()+ " ";
+            values += argument3.ToString();
+            return values;
         }
     }
 

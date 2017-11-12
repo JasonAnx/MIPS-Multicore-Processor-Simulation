@@ -76,25 +76,44 @@ namespace ProyectoArqui {
     class OperatingSystem {
 
         public void allocateInstInMem() {
-            string filePath = "0.txt";
-            try {
-                string[] lines = File.ReadAllLines(filePath);
-                for (int line = 0; line < lines.Length; line++) {
-                    string[] instructionParts = lines[line].Split(' ');
-                    Instruction inst = new Instruction(int.Parse(instructionParts[0]),
-                                                        int.Parse(instructionParts[1]),
-                                                        int.Parse(instructionParts[2]),
-                                                        int.Parse(instructionParts[3]));
-                    // ojo para el proc 1
-                    Computer.processors[0].isntrmem.insertInstr(inst);
+            for (int numProcessor = 0; numProcessor < 2; numProcessor++)
+            {
+                string folderPath = "p" + numProcessor;
+                string[] files = System.IO.Directory.GetFiles(folderPath);
+                foreach (string filePath in files)
+                {
+                    try
+                    {
+                        Console.WriteLine(filePath);
+                        string[] lines = File.ReadAllLines(filePath);
+                        for (int line = 0; line < lines.Length; line++)
+                        {
+                            string[] instructionParts = lines[line].Split(' ');
+                            Instruction inst = new Instruction(int.Parse(instructionParts[0]),
+                                                                int.Parse(instructionParts[1]),
+                                                                int.Parse(instructionParts[2]),
+                                                                int.Parse(instructionParts[3]));
+                            try
+                            {
+                                Computer.processors[numProcessor].isntrmem.insertInstr(inst);
+                            }
+                            catch {
+                                logError("Unable to insert instruction "+inst.printValue()+
+                                          " on instruction memory of processor "+ numProcessor);
+                            }
+                           
+
+                        }
+                        //Console.WriteLine(memoria.getBloque(5).word0.operation);
+                    }
+                    catch (FileNotFoundException e)
+                    {
+                        logError("File not found: " + filePath);
+                        logError("Could not load program");
+                        Environment.Exit(10);
+                        //Console.WriteLine("An error occurred: '{0}'", e);
+                    }
                 }
-                //Console.WriteLine(memoria.getBloque(5).word0.operation);
-            }
-            catch (FileNotFoundException e) {
-                logError("File not found: " + filePath);
-                logError("Could not load program");
-                Environment.Exit(10);
-                //Console.WriteLine("An error occurred: '{0}'", e);
             }
         }
         public static void log(string s) {
