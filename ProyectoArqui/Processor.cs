@@ -11,7 +11,7 @@ namespace ProyectoArqui {
 
         /// fields
         public InstructionMemory isntrmem;
-        public SharedMemory sharedMemory;
+        public SharedMemory shrmem;
 
         public int id { get; } // externaly read-only
 
@@ -25,6 +25,8 @@ namespace ProyectoArqui {
                 cores[i] = new Core(i, this);
             }
             isntrmem = new InstructionMemory(isntrmem_size);
+            //hardcodeado con un tamaño para probar hay que ponerlo como parametro
+            shrmem = new SharedMemory(16);
         }
 
         //Methods
@@ -36,11 +38,10 @@ namespace ProyectoArqui {
             }
         }
 
-
         // Intern Classes
 
         public class SharedMemory {
-            private static Mutex mutex = new Mutex();
+             private static Mutex mutex = new Mutex();
             static Bloque[] shMem;
             /* 
                Recordar que la memoria compartida de P0 es de 16 (0-15)
@@ -53,6 +54,45 @@ namespace ProyectoArqui {
                 {
                     shMem[i] = new Bloque(4);
                 }
+            }
+
+            public Bloque getBloque(int numBloque, Processor proc) {
+                Bloque returnBloque = new Bloque();
+                if (proc.id == 0 && numBloque < 16)
+                {
+                    returnBloque.setValue(shMem[numBloque]);
+                }
+                if (proc.id == 1 && numBloque >= 16)
+                {
+                    returnBloque.setValue(shMem[numBloque - 16]);
+
+                }
+                if ((proc.id == 0 && numBloque >= 16) || (proc.id == 1 && numBloque < 16))
+                {
+                    Console.WriteLine("The Block " + numBloque + " does not belong to the shared memory of processor " + proc.id + ".");
+                    returnBloque.generateErrorBloque();
+                }
+                return returnBloque;
+            }
+
+            public void insertBloque(int numBloque, Bloque block, Processor proc) {
+                if (proc.id == 0 && numBloque < 16)
+                {
+                    //shMem[numBloque].setValue(block);
+                    shMem[numBloque].word[0].operationCod = block.word[0].operationCod;
+                    shMem[numBloque].word[0].argument1 = -1;
+                    shMem[numBloque].word[0].argument2 = -1;
+                    shMem[numBloque].word[0].argument3 = -1;
+                }
+                if (proc.id == 1 && numBloque >= 16)
+                {
+                    shMem[numBloque - 16].setValue(block);
+                }
+                if ((proc.id == 0 && numBloque >= 16) || (proc.id == 1 && numBloque < 16))
+                {
+                    Console.WriteLine("The Block " + numBloque + " does not belong to the shared memory of processor " + proc.id + ".");
+                }
+
             }
         }
 

@@ -25,6 +25,17 @@ namespace ProyectoArqui {
             processors[0] = new Processor( /*id*/ 0,/*n_cores*/ 2, /*instmem_size*/ 24);
             processors[1] = new Processor( /*id*/ 1,/*n_cores*/ 1, /*instmem_size*/ 16);
 
+            Bloque bl = new Bloque(4);
+            for (int i = 0; i < 4; i++)
+            {
+                bl.word[i].operationCod = 66;
+                bl.word[i].argument1 = 66;
+                bl.word[i].argument2 = 66;
+                bl.word[i].argument3 = 66;
+            }
+            //processors[0].shrmem.insertBloque(0, bl, processors[0]);
+            //Console.WriteLine( processors[0].shrmem.getBloque(0, processors[0]).word[0].operationCod);
+            Console.ReadLine();
 
             // Sync Barrier
             bsync = new Barrier(getGlobalCoreCount(), (b) => {
@@ -83,18 +94,25 @@ namespace ProyectoArqui {
 
         public void allocateInstInMem() {
             string filePath = "0.txt";
-            string[] lines = File.ReadAllLines(filePath);
-
-            for (int line = 0; line < lines.Length; line++) {
-                string[] instructionParts = lines[line].Split(' ');
-                Instruction inst = new Instruction(int.Parse(instructionParts[0]),
-                                                    int.Parse(instructionParts[1]),
-                                                    int.Parse(instructionParts[2]),
-                                                    int.Parse(instructionParts[3]));
-                // ojo para el proc 1
-                Computer.processors[0].isntrmem.insertInstr(inst);
+            try
+            {
+                string[] lines = File.ReadAllLines(filePath);
+                for (int line = 0; line < lines.Length; line++)
+                {
+                    string[] instructionParts = lines[line].Split(' ');
+                    Instruction inst = new Instruction(int.Parse(instructionParts[0]),
+                                                        int.Parse(instructionParts[1]),
+                                                        int.Parse(instructionParts[2]),
+                                                        int.Parse(instructionParts[3]));
+                    // ojo para el proc 1
+                    Computer.processors[0].isntrmem.insertInstr(inst);
+                }
+                //Console.WriteLine(memoria.getBloque(5).word0.operation);
             }
-            //Console.WriteLine(memoria.getBloque(5).word0.operation);
+            catch (Exception e)
+            {
+                Console.WriteLine("An error occurred: '{0}'", e);
+            }
         }
     }
 

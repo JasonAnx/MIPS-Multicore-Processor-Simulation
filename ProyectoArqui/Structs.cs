@@ -13,6 +13,21 @@ namespace ProyectoArqui {
         {
             return this.word[numInstr];
         }
+
+        public void generateErrorBloque() {
+            for (int i = 0; i < 4; i++) {
+                word[i].operationCod = -1;
+                word[i].argument1 = -1;
+                word[i].argument2 = -1;
+                word[i].argument3 = -1;
+            }
+        }
+
+        public void setValue(Bloque bl) {
+            for (int i = 0; i < 4; i++) {
+                this.word[i].setValue(bl.word[i]);
+            }
+        }
     }
 
     public struct Instruction
