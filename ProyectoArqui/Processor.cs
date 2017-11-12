@@ -21,18 +21,18 @@ namespace ProyectoArqui {
         public Processor(int _id, int n_cores, int isntrmem_size) {
             id = _id;
             cores = new Core[n_cores];
+            for (int i = 0; i < cores.Length; i++) {
+                cores[i] = new Core(i, this);
+            }
             isntrmem = new InstructionMemory(isntrmem_size);
         }
 
         //Methods
         public void start() {
             //Console.WriteLine("procesador " + id + "tiene " + cores.Length + "cores");
-            for (int i = 0; i < cores.Length; i++) {
-                cores[i] = new Core(i, this);
-                // cambiar a thread por core, no por procsador
-                Thread t = new Thread(new ThreadStart(cores[i].start));
+            foreach (Core c in cores) {
+                Thread t = new Thread(new ThreadStart(c.start));
                 t.Start();
-                //Console.WriteLine("creado core  " + i + " en procesador " + id);
             }
         }
 
@@ -108,6 +108,11 @@ namespace ProyectoArqui {
 
             public void start() {
                 Console.WriteLine("hola desde nucleo  " + (_coreId + 1) + "/" + parent.cores.Length + " en procesador " + parent.id);
+                Computer.bsync.SignalAndWait();
+            }
+
+            public void stop() {
+                Computer.bsync.SignalAndWait();
             }
 
             // 
