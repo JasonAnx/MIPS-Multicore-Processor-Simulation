@@ -6,7 +6,7 @@ namespace ProyectoArqui {
     public partial class Processor {
 
         public partial class Core {
-            public void decodificar(Instruction _instruction) {
+            public void execute_instruction(Instruction _instruction) {
 
                 int copOp = _instruction.operationCod;
                 int arg1 = _instruction.argument1;
