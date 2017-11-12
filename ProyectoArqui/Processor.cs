@@ -36,9 +36,25 @@ namespace ProyectoArqui {
             }
         }
 
+
         // Intern Classes
 
-        public class SharedMemory { }
+        public class SharedMemory {
+            private static Mutex mutex = new Mutex();
+            static Bloque[] shMem;
+            /* 
+               Recordar que la memoria compartida de P0 es de 16 (0-15)
+               y la de P1 es de 8 (16-23).  
+            */
+            public SharedMemory(int sizeMem) {
+                shMem = new Bloque[sizeMem];
+                shMem = new Bloque[sizeMem];
+                for (int i = 0; i < sizeMem; i++)
+                {
+                    shMem[i] = new Bloque(4);
+                }
+            }
+        }
 
         public class InstructionMemory {
             //Attributes
