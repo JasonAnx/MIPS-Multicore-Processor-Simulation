@@ -41,14 +41,13 @@ namespace ProyectoArqui {
         // Intern Classes
 
         public class SharedMemory {
-             private static Mutex mutex = new Mutex();
+            private static Mutex mutex = new Mutex();
             static Bloque[] shMem;
             /* 
                Recordar que la memoria compartida de P0 es de 16 (0-15)
                y la de P1 es de 8 (16-23).  
             */
             public SharedMemory(int sizeMem) {
-                shMem = new Bloque[sizeMem];
                 shMem = new Bloque[sizeMem];
                 for (int i = 0; i < sizeMem; i++)
                 {
@@ -57,7 +56,7 @@ namespace ProyectoArqui {
             }
 
             public Bloque getBloque(int numBloque, Processor proc) {
-                Bloque returnBloque = new Bloque();
+                Bloque returnBloque = new Bloque(4);
                 if (proc.id == 0 && numBloque < 16)
                 {
                     returnBloque.setValue(shMem[numBloque]);
@@ -75,23 +74,24 @@ namespace ProyectoArqui {
                 return returnBloque;
             }
 
-            public void insertBloque(int numBloque, Bloque block, Processor proc) {
+            public bool insertBloque(int numBloque, Bloque block, Processor proc) {
+                bool inserted = false;
                 if (proc.id == 0 && numBloque < 16)
                 {
                     //shMem[numBloque].setValue(block);
-                    shMem[numBloque].word[0].operationCod = block.word[0].operationCod;
-                    shMem[numBloque].word[0].argument1 = -1;
-                    shMem[numBloque].word[0].argument2 = -1;
-                    shMem[numBloque].word[0].argument3 = -1;
+                    shMem[numBloque].setValue(block);
+                    inserted = true;
                 }
                 if (proc.id == 1 && numBloque >= 16)
                 {
                     shMem[numBloque - 16].setValue(block);
+                    inserted = true;
                 }
                 if ((proc.id == 0 && numBloque >= 16) || (proc.id == 1 && numBloque < 16))
                 {
                     Console.WriteLine("The Block " + numBloque + " does not belong to the shared memory of processor " + proc.id + ".");
                 }
+                return inserted;
 
             }
         }

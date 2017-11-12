@@ -25,18 +25,6 @@ namespace ProyectoArqui {
             processors[0] = new Processor( /*id*/ 0,/*n_cores*/ 2, /*instmem_size*/ 24);
             processors[1] = new Processor( /*id*/ 1,/*n_cores*/ 1, /*instmem_size*/ 16);
 
-            Bloque bl = new Bloque(4);
-            for (int i = 0; i < 4; i++)
-            {
-                bl.word[i].operationCod = 66;
-                bl.word[i].argument1 = 66;
-                bl.word[i].argument2 = 66;
-                bl.word[i].argument3 = 66;
-            }
-            //processors[0].shrmem.insertBloque(0, bl, processors[0]);
-            //Console.WriteLine( processors[0].shrmem.getBloque(0, processors[0]).word[0].operationCod);
-            Console.ReadLine();
-
             // Sync Barrier
             bsync = new Barrier(getGlobalCoreCount(), (b) => {
                 clock++;
