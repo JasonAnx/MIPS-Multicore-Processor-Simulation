@@ -110,17 +110,11 @@ namespace ProyectoArqui {
                     {
                         logError("File not found: " + filePath);
                         logError("Could not load program");
-                        Environment.Exit(10);
+                        Environment.Exit(11);
                         //Console.WriteLine("An error occurred: '{0}'", e);
                     }
                 }
                 //Console.WriteLine(memoria.getBloque(5).word0.operation);
-            }
-            catch (FileNotFoundException e) {
-                logError("File not found: " + filePath);
-                logError("Could not load program");
-                Environment.Exit(11);
-                //Console.WriteLine("An error occurred: '{0}'", e);
             }
         }
         public static void log(string s) {
