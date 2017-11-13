@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading;
+using System.Collections;
 
 namespace ProyectoArqui {
 
@@ -16,6 +17,8 @@ namespace ProyectoArqui {
         public int id { get; } // externaly read-only
 
         private Core[] cores;
+
+        public Queue contextQueue;
 
         // constructor
         public Processor(int _id, int n_cores, int isntrmem_size) {
@@ -156,6 +159,45 @@ namespace ProyectoArqui {
                 dataCache = new DataCache(4);
             }
 
+            // Create a new Context struct, save current context and insert it in the contextQueue
+
+            public void saveCurrentContext()
+            {
+                int currentThreadId = getId();
+                int[] registerValues = registers;
+                // Todav¨ªa esto no se mide
+                float currentThreadExecutionTime = 0;
+                bool threadIsFinalized = false;
+
+                Context currentContext = new Context(currentThreadId, currentThreadExecutionTime, registerValues, threadIsFinalized);
+                parent.contextQueue.Enqueue(currentContext);
+            }
+
+            // Loads last Context in Context queue
+
+            public void loadNewContext()
+            {
+                // Loads last Context in Queue
+                Context newContext = (Context)parent.contextQueue.Dequeue();
+                // Only load register values for now
+                int[] newRegisterValues = newContext.getRegisterValues();
+                registers = newRegisterValues;
+            }
+
+            // Saves current Context in auxiliary variable, dequeues and loads last Context in contextQueue
+            // Enqueues old Context in contextQueue
+
+            public void contextSwitch(){
+
+                // Store old Context
+
+                saveCurrentContext();
+
+                // Load new Context
+
+                loadNewContext();
+            }
+
             // 
             public struct InstructionCache {
                 Bloque[] instrsInCache;
@@ -213,7 +255,6 @@ namespace ProyectoArqui {
                         return new Instruction();
                     }
                 }
-
             }
 
         }

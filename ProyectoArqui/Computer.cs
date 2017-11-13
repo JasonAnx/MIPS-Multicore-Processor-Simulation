@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-using System.Collections;
 
 
 namespace ProyectoArqui
@@ -153,22 +152,6 @@ namespace ProyectoArqui
             }
             else Console.ResetColor();
         }
-
-        // Create a new Context struct, save current context and insert it in the contextQueue
-
-        public void saveCurrentContext(Processor.Core currentCore)
-        {
-            int currentThreadId = currentCore.getId();
-            int[] currentRegisterValues = currentCore.registers;
-            // Todavía esto no se mide
-            float currentThreadExecutionTime = 0;
-            bool threadIsFinalized = false;
-
-            Context currentContext = new Context(currentThreadId, currentThreadExecutionTime, currentRegisterValues, threadIsFinalized);
-            contextQueue.Enqueue(currentContext);
-        }
-
-        public Queue contextQueue;
     }
 
     class Directory

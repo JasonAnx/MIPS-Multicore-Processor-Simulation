@@ -69,14 +69,15 @@ namespace ProyectoArqui {
         int threadId;
         float threadExecutionTime;
         // Current thread register values 
-        int[] currentRegisterValues;
+        private int[] registerValues;
         bool threadIsFinalized;
-        public Context(int threadId, float threadExecutionTime, int[] currentRegisterValues, bool threadIsFinalized){
+        public Context(int threadId, float threadExecutionTime, int[] registerValues, bool threadIsFinalized){
             this.threadId = threadId;
             this.threadExecutionTime = threadExecutionTime;
-            this.currentRegisterValues = currentRegisterValues;
+            this.registerValues = registerValues;
             this.threadIsFinalized = threadIsFinalized;
         }
+        public int[] getRegisterValues() { return registerValues; }
     }
 
 
