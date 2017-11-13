@@ -171,7 +171,7 @@ namespace ProyectoArqui {
 
             // Loads last Context in Context queue
 
-            public void loadContext()
+            public void loadNewContext()
             {
                 // Loads last Context in Queue
                 Context newContext = (Context)parent.contextQueue.Dequeue();
@@ -180,6 +180,19 @@ namespace ProyectoArqui {
                 registers = newRegisterValues;
             }
 
+            // Saves current Context in auxiliary variable, dequeues and loads last Context in contextQueue
+            // Enqueues old Context in contextQueue
+
+            public void contextSwitch(){
+
+                // Store old Context
+
+                saveCurrentContext();
+
+                // Load new Context
+
+                loadNewContext();
+            }
 
             // 
             public struct InstructionCache {
