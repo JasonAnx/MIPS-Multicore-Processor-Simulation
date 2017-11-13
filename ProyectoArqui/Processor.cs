@@ -162,22 +162,20 @@ namespace ProyectoArqui {
 
             // 
             public struct InstructionCache {
-                Instruction[] instrsInCache;
+                Bloque[] instrsInCache;
                 int[] labelsOfInstrs;
 
                 public InstructionCache(int cacheSize) {
-                    instrsInCache = new Instruction[cacheSize];
+                    instrsInCache = new Bloque[cacheSize];
                     labelsOfInstrs = new int[cacheSize];
                     /* 
                        Inicializa las 4 Instrucciones (16 enteros) con 0s.
                        Inicializa las etiquetas de las 4 Instrucciones en direcciones no existentes (-1).
                      */
                     for (int i = 0; i < cacheSize; i++) {
-                        instrsInCache[i].operationCod = 0;
-                        instrsInCache[i].argument1 = 0;
-                        instrsInCache[i].argument2 = 0;
-                        instrsInCache[i].argument3 = 0;
-                        labelsOfInstrs[i] = -1;
+                        instrsInCache[i] = new Bloque(4);
+                        //llena todos las instrucciones de los bloques con -1
+                        instrsInCache[i].generateErrorBloque();
                     }
 
                 }
@@ -185,12 +183,12 @@ namespace ProyectoArqui {
 
             public struct DataCache {
                 enum states { shared, invalid, modified }
-                Instruction[] instrsInCache;
+                Bloque[] instrsInCache;
                 int[] labelsOfInstrs;
                 states[] statesOfInstrs;
 
                 public DataCache(int cacheSize) {
-                    instrsInCache = new Instruction[cacheSize];
+                    instrsInCache = new Bloque[cacheSize];
                     labelsOfInstrs = new int[cacheSize];
                     statesOfInstrs = new states[cacheSize];
                     /* 
@@ -199,10 +197,7 @@ namespace ProyectoArqui {
                        Inicializa las etiquetas de las 4 Instrucciones en direcciones no existentes (-1).
                      */
                     for (int i = 0; i < cacheSize; i++) {
-                        instrsInCache[i].operationCod = 0;
-                        instrsInCache[i].argument1 = 0;
-                        instrsInCache[i].argument2 = 0;
-                        instrsInCache[i].argument3 = 0;
+                        instrsInCache[i] = new Bloque(4);
                         statesOfInstrs[i] = states.invalid;
                         labelsOfInstrs[i] = -1;
                     }
