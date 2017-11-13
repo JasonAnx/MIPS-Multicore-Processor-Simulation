@@ -24,7 +24,7 @@ namespace ProyectoArqui
 
                     while (0 < quantum)
                     {
-                        Instruction nxtIst = dataCache.fetchInstruction();
+                        Instruction nxtIst = dataCache.fetchInstruction(0,this);
                         execute_instruction(nxtIst);
                         Computer.bsync.SignalAndWait();
                     }

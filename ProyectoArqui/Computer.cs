@@ -3,13 +3,14 @@ using System.IO;
 using System.Threading;
 using System.Collections;
 
+
 namespace ProyectoArqui
 {
     // Ctrl k + d     
     //        auto format (VS-only)
     class Computer
     {
-
+        
         // atributes
         /* private atr */
         private static int clock, quantum;
@@ -17,7 +18,7 @@ namespace ProyectoArqui
         /* public atr */
         public static Processor[] processors;
         public static Barrier bsync;
-
+        public const int block_size = 4;
         /************************** MAIN **************************/
 
         [STAThread]

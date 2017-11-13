@@ -54,12 +54,12 @@ namespace ProyectoArqui {
             public SharedMemory(int sizeMem) {
                 shMem = new Bloque[sizeMem];
                 for (int i = 0; i < sizeMem; i++) {
-                    shMem[i] = new Bloque(4);
+                    shMem[i] = new Bloque(Computer.block_size);
                 }
             }
 
             public Bloque getBloque(int numBloque, Processor proc) {
-                Bloque returnBloque = new Bloque(4);
+                Bloque returnBloque = new Bloque(Computer.block_size);
                 if (proc.id == 0 && numBloque < 16) {
                     returnBloque.setValue(shMem[numBloque]);
                 }
@@ -120,6 +120,10 @@ namespace ProyectoArqui {
                 mem[lastBlock].word[lastInstr].setValue(instr);
                 lastInstr++;
             }
+
+            public int getLength() {
+                return mem.Length;
+            }
             /*
 
             public Bloque getBloque(int indexBloque) {
@@ -165,7 +169,7 @@ namespace ProyectoArqui {
                        Inicializa las etiquetas de las 4 Instrucciones en direcciones no existentes (-1).
                      */
                     for (int i = 0; i < cacheSize; i++) {
-                        instrsInCache[i] = new Bloque(4);
+                        instrsInCache[i] = new Bloque(Computer.block_size);
                         //llena todos las instrucciones de los bloques con -1
                         instrsInCache[i].generateErrorBloque();
                     }
@@ -184,20 +188,30 @@ namespace ProyectoArqui {
                     labelsOfInstrs = new int[cacheSize];
                     statesOfInstrs = new states[cacheSize];
                     /* 
-                       Inicializa las 4 Instrucciones (16 enteros) con 0s.
-                       Inicializa los estados de las 4 Instrucciones en Invalidos (I).
-                       Inicializa las etiquetas de las 4 Instrucciones en direcciones no existentes (-1).
+                       Inicializa los 4 Bloques con 0s.
+                       Inicializa los estados en Invalidos (I).
+                       Inicializa las etiquetas de los 4 Bloques en direcciones no existentes (-1).
                      */
                     for (int i = 0; i < cacheSize; i++) {
-                        instrsInCache[i] = new Bloque(4);
+                        instrsInCache[i] = new Bloque(Computer.block_size);
                         statesOfInstrs[i] = states.invalid;
                         labelsOfInstrs[i] = -1;
                     }
                 } // EO constructor
 
-                public Instruction fetchInstruction( /*params*/ ) {
+                public Instruction fetchInstruction(int program_counter, Core c) {
                     // TODO
-                    return new Instruction(); // remove
+                    int dirBloque = program_counter / Computer.block_size;
+                    int dirPalabra = program_counter % c.parent.isntrmem.getLength() / Computer.block_size;
+                    /*No entiendo esto*/
+                    if (labelsOfInstrs[dirBloque] == dirBloque)
+                    {
+                        return instrsInCache[dirBloque].word[dirPalabra];
+                    }
+                    /*Aqui se supone que va el fallo de cache*/
+                    else {
+                        return new Instruction();
+                    }
                 }
 
             }
