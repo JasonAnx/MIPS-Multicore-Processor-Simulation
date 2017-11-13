@@ -2,31 +2,51 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ProyectoArqui {
-    public partial class Processor {
+namespace ProyectoArqui
+{
+    public partial class Processor
+    {
 
-        public partial class Core {
+        public partial class Core
+        {
 
+            private int quantum = 5;
+            int pc = 0; // memory position of the next instruction to be fetched
             /// <summary>
             /// starts the execution of the threads
             /// controls the thread time/quantum and context change
             /// </summary>
-            public void start() {
-                Console.WriteLine("hola desde nucleo  " + (_coreId + 1) + "/" + parent.cores.Length + " en procesador " + parent.id);
-                Computer.bsync.SignalAndWait();
+            public void start()
+            {
+                Console.WriteLine("Hello! from Core  " + (_coreId + 1) + "/" + parent.getCoreCount() + " on Processor" + parent.id);
+                while (  /*ctxQueue.loadThread()*/ true)
+                {
+
+                    while (0 < quantum)
+                    {
+                        Instruction nxtIst = dataCache.fetchInstruction();
+                        execute_instruction(nxtIst);
+                        Computer.bsync.SignalAndWait();
+                    }
+
+
+                }
             }
 
-            public void stop() {
+            public void stop()
+            {
                 Computer.bsync.SignalAndWait();
             }
-            public void execute_instruction(Instruction _instruction) {
+            public void execute_instruction(Instruction _instruction)
+            {
 
                 int copOp = _instruction.operationCod;
                 int arg1 = _instruction.argument1;
                 int arg2 = _instruction.argument2;
                 int arg3 = _instruction.argument3;
 
-                switch (copOp) {
+                switch (copOp)
+                {
 
                     case -1:
                         //suspendido = 16;
@@ -66,10 +86,12 @@ namespace ProyectoArqui {
 
                         //hay que hacer el caso if (dato == null) para que se proceda a intentar de nuevo
                         //con el fallo de caché ya resuelto                                        
-                        if (datoLoad != null) {
+                        if (datoLoad != null)
+                        {
                             registers[arg2] = ((int)datoLoad);
                         }
-                        else {
+                        else
+                        {
                             // ?????
                         }
 
@@ -100,13 +122,15 @@ namespace ProyectoArqui {
 
                     /***BRANCHING Y DEMAS***/
                     case 4:
-                        if (registers[arg1] == 0) {
+                        if (registers[arg1] == 0)
+                        {
                             //cP += arg3;
                         }
                         break;
 
                     case 5:
-                        if (registers[arg1] != 0) {
+                        if (registers[arg1] != 0)
+                        {
                             //cP += arg3;
                         }
                         break;
@@ -125,7 +149,8 @@ namespace ProyectoArqui {
                         // set as finished in context
                         break;
                     default:
-                        Console.WriteLine("unknow instruction");
+                        string reporter = "[Core  " + (_coreId + 1) + "/" + parent.getCoreCount() + " on Processor" + parent.id + "]";
+                        OperatingSystem.logError(reporter + " Error: Unknown Instruction opCode: " + copOp, true);
                         Environment.Exit(0);
                         break;
                 }

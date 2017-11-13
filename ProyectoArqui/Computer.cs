@@ -3,12 +3,12 @@ using System.IO;
 using System.Threading;
 using System.Collections;
 
-namespace ProyectoArqui {
-
-
+namespace ProyectoArqui
+{
     // Ctrl k + d     
     //        auto format (VS-only)
-    class Computer {
+    class Computer
+    {
 
         // atributes
         /* private atr */
@@ -21,7 +21,8 @@ namespace ProyectoArqui {
         /************************** MAIN **************************/
 
         [STAThread]
-        static void Main(string[] args) {
+        static void Main(string[] args)
+        {
             OperatingSystem.log("Started.");
             processors = new Processor[2];
 
@@ -29,7 +30,8 @@ namespace ProyectoArqui {
             processors[1] = new Processor( /*id*/ 1,/*n_cores*/ 1, /*instmem_size*/ 16);
 
             // Sync Barrier
-            bsync = new Barrier(getGlobalCoreCount(), (b) => {
+            bsync = new Barrier(getGlobalCoreCount(), (b) =>
+            {
                 clock++;
                 quantum--;
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -42,34 +44,42 @@ namespace ProyectoArqui {
 
             loadData();
             execute();
+
             var name = Console.ReadLine();
         }
 
         /************************** MAIN **************************/
 
-        public static void checkBarrierIntegrity() {
+        public static void checkBarrierIntegrity()
+        {
             if (bsync == null) Environment.Exit(10);
-            if (bsync.ParticipantCount != getGlobalCoreCount()) {
+            if (bsync.ParticipantCount != getGlobalCoreCount())
+            {
                 Environment.Exit(10);
             }
         }
 
 
-        public static int getGlobalCoreCount() {
+        public static int getGlobalCoreCount()
+        {
             int totalCores = 0;
-            foreach (Processor p in processors) {
-                totalCores += p.cores.Length;
+            foreach (Processor p in processors)
+            {
+                totalCores += p.getCoreCount();
             }
             return totalCores;
         }
 
-        public static void loadData() {
+        public static void loadData()
+        {
             OS.allocateInstInMem();
         }
 
-        public static void execute() {
+        public static void execute()
+        {
             // inicia los hilos
-            foreach (Processor p in processors) {
+            foreach (Processor p in processors)
+            {
                 p.start();
             }
         }
@@ -131,11 +141,16 @@ namespace ProyectoArqui {
             Console.WriteLine("[OS Message]: " + s);
             Console.ResetColor();
         }
-        public static void logError(string s)
+        public static void logError(string s, bool halt = false)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("[OS Message]: " + s);
-            Console.ResetColor();
+            if (halt)
+            {
+                Console.WriteLine("\tProgram Halted. Press any key to exit");
+                Console.ReadLine();
+            }
+            else Console.ResetColor();
         }
 
         // Create a new Context struct, save current context and insert it in the contextQueue
@@ -155,13 +170,15 @@ namespace ProyectoArqui {
         public Queue contextQueue;
     }
 
-    class Directory {
+    class Directory
+    {
 
         // Construye las dos matrices según la cantidad de bloques y caches ingresados
         // Lleva dos matrices:
         // - Una es de dimensiones 2 x cantBloques, lleva en cada fila la etiqueta del bloque y su estado
         // - Otra es de dimensiones cantidadCaches x cantBloques, lleva en cada fila 
-        public Directory(int n_blocks, int n_caches) {
+        public Directory(int n_blocks, int n_caches)
+        {
             block_state_matrix = new string[2, n_blocks];
             caches_matrix = new Boolean[n_caches, n_blocks];
         }
