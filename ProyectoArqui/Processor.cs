@@ -151,15 +151,6 @@ namespace ProyectoArqui {
                 registers = new int[32];
             }
 
-            public void start() {
-                Console.WriteLine("hola desde nucleo  " + (_coreId + 1) + "/" + parent.cores.Length + " en procesador " + parent.id);
-                Computer.bsync.SignalAndWait();
-            }
-
-            public void stop() {
-                Computer.bsync.SignalAndWait();
-            }
-
             // 
             public struct InstructionCache {
                 Instruction[] instrsInCache;

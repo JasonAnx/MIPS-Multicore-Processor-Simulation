@@ -6,6 +6,19 @@ namespace ProyectoArqui {
     public partial class Processor {
 
         public partial class Core {
+
+            /// <summary>
+            /// starts the execution of the threads
+            /// controls the thread time/quantum and context change
+            /// </summary>
+            public void start() {
+                Console.WriteLine("hola desde nucleo  " + (_coreId + 1) + "/" + parent.cores.Length + " en procesador " + parent.id);
+                Computer.bsync.SignalAndWait();
+            }
+
+            public void stop() {
+                Computer.bsync.SignalAndWait();
+            }
             public void execute_instruction(Instruction _instruction) {
 
                 int copOp = _instruction.operationCod;
