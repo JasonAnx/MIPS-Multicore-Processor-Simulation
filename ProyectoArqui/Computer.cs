@@ -38,7 +38,7 @@ namespace ProyectoArqui {
             });
             checkBarrierIntegrity();
 
-            Console.WriteLine("theres a total of " + getGlobalCoreCount() + " cores in this virtual machine");
+            OperatingSystem.log("There is a total of " + getGlobalCoreCount() + " cores in this virtual machine");
 
             loadData();
             execute();
