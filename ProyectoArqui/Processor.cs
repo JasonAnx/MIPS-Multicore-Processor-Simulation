@@ -15,7 +15,7 @@ namespace ProyectoArqui {
 
         public int id { get; } // externaly read-only
 
-        public Core[] cores;
+        private Core[] cores;
 
         // constructor
         public Processor(int _id, int n_cores, int isntrmem_size) {
@@ -27,6 +27,10 @@ namespace ProyectoArqui {
             isntrmem = new InstructionMemory(isntrmem_size);
             //hardcodeado con un tamaño para probar hay que ponerlo como parametro
             shrmem = new SharedMemory(16);
+        }
+
+        public int getCoreCount() {
+            return cores.Length;
         }
 
         //Methods
@@ -49,25 +53,21 @@ namespace ProyectoArqui {
             */
             public SharedMemory(int sizeMem) {
                 shMem = new Bloque[sizeMem];
-                for (int i = 0; i < sizeMem; i++)
-                {
+                for (int i = 0; i < sizeMem; i++) {
                     shMem[i] = new Bloque(4);
                 }
             }
 
             public Bloque getBloque(int numBloque, Processor proc) {
                 Bloque returnBloque = new Bloque(4);
-                if (proc.id == 0 && numBloque < 16)
-                {
+                if (proc.id == 0 && numBloque < 16) {
                     returnBloque.setValue(shMem[numBloque]);
                 }
-                if (proc.id == 1 && numBloque >= 16)
-                {
+                if (proc.id == 1 && numBloque >= 16) {
                     returnBloque.setValue(shMem[numBloque - 16]);
 
                 }
-                if ((proc.id == 0 && numBloque >= 16) || (proc.id == 1 && numBloque < 16))
-                {
+                if ((proc.id == 0 && numBloque >= 16) || (proc.id == 1 && numBloque < 16)) {
                     Console.WriteLine("The Block " + numBloque + " does not belong to the shared memory of processor " + proc.id + ".");
                     returnBloque.generateErrorBloque();
                 }
@@ -76,19 +76,16 @@ namespace ProyectoArqui {
 
             public bool insertBloque(int numBloque, Bloque block, Processor proc) {
                 bool inserted = false;
-                if (proc.id == 0 && numBloque < 16)
-                {
+                if (proc.id == 0 && numBloque < 16) {
                     //shMem[numBloque].setValue(block);
                     shMem[numBloque].setValue(block);
                     inserted = true;
                 }
-                if (proc.id == 1 && numBloque >= 16)
-                {
+                if (proc.id == 1 && numBloque >= 16) {
                     shMem[numBloque - 16].setValue(block);
                     inserted = true;
                 }
-                if ((proc.id == 0 && numBloque >= 16) || (proc.id == 1 && numBloque < 16))
-                {
+                if ((proc.id == 0 && numBloque >= 16) || (proc.id == 1 && numBloque < 16)) {
                     Console.WriteLine("The Block " + numBloque + " does not belong to the shared memory of processor " + proc.id + ".");
                 }
                 return inserted;
@@ -114,8 +111,7 @@ namespace ProyectoArqui {
 
             //Methods
             public void insertInstr(Instruction instr) {
-                if (lastInstr > 3)
-                {
+                if (lastInstr > 3) {
                     lastInstr = 0;
                     lastBlock++;
                     if (lastBlock > mem.Length)
@@ -143,21 +139,17 @@ namespace ProyectoArqui {
             private int _coreId;
             public int getId() { return _coreId; }
             Processor parent;
+            InstructionCache instructionsCache;
+            DataCache dataCache;
+
             public int[] registers;
 
             public Core(int _id, Processor prnt) {
                 _coreId = _id;
                 parent = prnt;
                 registers = new int[32];
-            }
-
-            public void start() {
-                Console.WriteLine("hola desde nucleo  " + (_coreId + 1) + "/" + parent.cores.Length + " en procesador " + parent.id);
-                Computer.bsync.SignalAndWait();
-            }
-
-            public void stop() {
-                Computer.bsync.SignalAndWait();
+                instructionsCache = new InstructionCache(4);
+                dataCache = new DataCache(4);
             }
 
             // 
@@ -201,6 +193,11 @@ namespace ProyectoArqui {
                         statesOfInstrs[i] = states.invalid;
                         labelsOfInstrs[i] = -1;
                     }
+                } // EO constructor
+
+                public Instruction fetchInstruction( /*params*/ ) {
+                    // TODO
+                    return new Instruction(); // remove
                 }
 
             }
