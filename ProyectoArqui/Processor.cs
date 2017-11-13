@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading;
+using System.Collections;
 
 namespace ProyectoArqui {
 
@@ -16,6 +17,8 @@ namespace ProyectoArqui {
         public int id { get; } // externaly read-only
 
         private Core[] cores;
+
+        public Queue contextQueue;
 
         // constructor
         public Processor(int _id, int n_cores, int isntrmem_size) {
@@ -40,6 +43,20 @@ namespace ProyectoArqui {
                 Thread t = new Thread(new ThreadStart(c.start));
                 t.Start();
             }
+        }
+
+        // Create a new Context struct, save current context and insert it in the contextQueue
+
+        public void saveCurrentContext(Processor.Core currentCore)
+        {
+            int currentThreadId = currentCore.getId();
+            int[] currentRegisterValues = currentCore.registers;
+            // Todav¨ªa esto no se mide
+            float currentThreadExecutionTime = 0;
+            bool threadIsFinalized = false;
+
+            Context currentContext = new Context(currentThreadId, currentThreadExecutionTime, currentRegisterValues, threadIsFinalized);
+            contextQueue.Enqueue(currentContext);
         }
 
         // Intern Classes
