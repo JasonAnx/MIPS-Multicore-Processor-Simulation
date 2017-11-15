@@ -13,6 +13,7 @@ namespace ProyectoArqui {
         /// fields
         public InstructionMemory isntrmem;
         public SharedMemory shrmem;
+        public DirectoryProc dir;
 
         public int id { get; } // externaly read-only
 
@@ -20,16 +21,18 @@ namespace ProyectoArqui {
 
         public Queue contextQueue;
 
+        public const int numCaches = 3;
+
         // constructor
-        public Processor(int _id, int n_cores, int isntrmem_size) {
+        public Processor(int _id, int n_cores, int isntrmem_size, int shrmem_size) {
             id = _id;
             cores = new Core[n_cores];
             for (int i = 0; i < cores.Length; i++) {
                 cores[i] = new Core(i, this);
             }
             isntrmem = new InstructionMemory(isntrmem_size);
-            //hardcodeado con un tamaño para probar hay que ponerlo como parametro
-            shrmem = new SharedMemory(16);
+            shrmem = new SharedMemory(shrmem_size, this);
+            dir = new DirectoryProc(shrmem_size, numCaches);
         }
 
         public int getCoreCount() {
@@ -50,46 +53,47 @@ namespace ProyectoArqui {
         public class SharedMemory {
             private static Mutex mutex = new Mutex();
             static Bloque[] shMem;
+            Processor parent;
             /* 
                Recordar que la memoria compartida de P0 es de 16 (0-15)
                y la de P1 es de 8 (16-23).  
             */
-            public SharedMemory(int sizeMem) {
+            public SharedMemory(int sizeMem, Processor prnt) {
+                parent = prnt;
                 shMem = new Bloque[sizeMem];
                 for (int i = 0; i < sizeMem; i++) {
                     shMem[i] = new Bloque(Computer.block_size);
                 }
             }
 
-            public Bloque getBloque(int numBloque, Processor proc) {
+            public Bloque getBloque(int numBloque) {
                 Bloque returnBloque = new Bloque(Computer.block_size);
-                if (proc.id == 0 && numBloque < 16) {
+                if (parent.id == 0 && numBloque < 16) {
                     returnBloque.setValue(shMem[numBloque]);
                 }
-                if (proc.id == 1 && numBloque >= 16) {
+                if (parent.id == 1 && numBloque >= 16) {
                     returnBloque.setValue(shMem[numBloque - 16]);
 
                 }
-                if ((proc.id == 0 && numBloque >= 16) || (proc.id == 1 && numBloque < 16)) {
-                    Console.WriteLine("The Block " + numBloque + " does not belong to the shared memory of processor " + proc.id + ".");
+                if ((parent.id == 0 && numBloque >= 16) || (parent.id == 1 && numBloque < 16)) {
+                    Console.WriteLine("The Block " + numBloque + " does not belong to the shared memory of processor " + parent.id + ".");
                     returnBloque.generateErrorBloque();
                 }
                 return returnBloque;
             }
 
-            public bool insertBloque(int numBloque, Bloque block, Processor proc) {
+            public bool insertBloque(int numBloque, Bloque block) {
                 bool inserted = false;
-                if (proc.id == 0 && numBloque < 16) {
-                    //shMem[numBloque].setValue(block);
+                if (parent.id == 0 && numBloque < 16) {
                     shMem[numBloque].setValue(block);
                     inserted = true;
                 }
-                if (proc.id == 1 && numBloque >= 16) {
+                if (parent.id == 1 && numBloque >= 16) {
                     shMem[numBloque - 16].setValue(block);
                     inserted = true;
                 }
-                if ((proc.id == 0 && numBloque >= 16) || (proc.id == 1 && numBloque < 16)) {
-                    Console.WriteLine("The Block " + numBloque + " does not belong to the shared memory of processor " + proc.id + ".");
+                if ((parent.id == 0 && numBloque >= 16) || (parent.id == 1 && numBloque < 16)) {
+                    Console.WriteLine("The Block " + numBloque + " does not belong to the shared memory of processor " + parent.id + ".");
                 }
                 return inserted;
 
@@ -134,6 +138,30 @@ namespace ProyectoArqui {
 
             }
             */
+
+        }
+
+        public class DirectoryProc
+        {
+            string[,] block_state_matrix;
+            Boolean[,] caches_matrix;
+            // Construye las dos matrices según la cantidad de bloques y caches ingresados
+            // Lleva dos matrices:
+            // - Una es de dimensiones 2 x cantBloques, lleva en cada fila la etiqueta del bloque y su estado
+            // - Otra es de dimensiones cantidadCaches x cantBloques, lleva en cada fila 
+            public DirectoryProc(int n_blocks, int n_caches)
+            {
+                block_state_matrix = new string[2, n_blocks];
+                caches_matrix = new Boolean[n_caches, n_blocks];
+            }
+
+            public string[,] getStateMatrix() {
+                return block_state_matrix;
+            }
+
+            public Boolean[,] getCacheMatrix() {
+                return caches_matrix;
+            }
 
         }
 
@@ -255,13 +283,30 @@ namespace ProyectoArqui {
                         return new Instruction();
                     }
                 }
+
+                public void allocate(int dirBloque, Core c) {
+                    /*Se supone que en esa función se deberia bloquear el directorio primero*/
+                    if (Computer.tryBlockHomeDirectory(dirBloque)) {
+                        /* Se revisa el estado del bloque en el directorio*/
+                        if (Computer.getHomeDirectory(dirBloque).getStateMatrix()[dirBloque, 1] == "M") {
+                            /*Bloquear cache*/
+                            /*Bloquear bus*/
+                            /* Esto se supone que inserta el bloque en la memoria compartida*/
+                            c.parent.shrmem.insertBloque(dirBloque, instrsInCache[dirBloque]);
+                            statesOfInstrs[dirBloque] = states.shared;
+                            instrsInCache[dirBloque] = c.parent.shrmem.getBloque(dirBloque);
+                        }
+                        else {
+                            /*En caso de que no este en estado M*/
+                        }
+                    }
+                    else {
+                        /*En caso de que no pueda bloquear directorio*/
+                    }
+                }
             }
 
         }
         //Methods
     }
-
-
-
-
 }

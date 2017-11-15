@@ -18,6 +18,8 @@ namespace ProyectoArqui
         public static Processor[] processors;
         public static Barrier bsync;
         public const int block_size = 4;
+        public const int p0_sharedmem_size = 16;
+        public const int p1_sharedmem_size = 8;
         /************************** MAIN **************************/
 
         [STAThread]
@@ -26,8 +28,8 @@ namespace ProyectoArqui
             OperatingSystem.log("Started.");
             processors = new Processor[2];
 
-            processors[0] = new Processor( /*id*/ 0,/*n_cores*/ 2, /*instmem_size*/ 24);
-            processors[1] = new Processor( /*id*/ 1,/*n_cores*/ 1, /*instmem_size*/ 16);
+            processors[0] = new Processor( /*id*/ 0,/*n_cores*/ 2, /*instmem_size*/ 24, /*sharedmem_size*/ p0_sharedmem_size);
+            processors[1] = new Processor( /*id*/ 1,/*n_cores*/ 1, /*instmem_size*/ 16, /*sharedmem_size*/ p1_sharedmem_size);
 
             // Sync Barrier
             bsync = new Barrier(getGlobalCoreCount(), (b) =>
@@ -81,6 +83,33 @@ namespace ProyectoArqui
             foreach (Processor p in processors)
             {
                 p.start();
+            }
+        }
+
+        public static bool tryBlockHomeDirectory(int dirBlock)
+        {
+            bool dirBlocked = false;
+            if (dirBlock < p0_sharedmem_size)
+            {
+                //bloquear directorio de P0
+                dirBlocked = true; /* si se logra*/
+            }
+            else {
+                //bloquear directorio de P1
+                dirBlocked = true; /* si se logra*/
+            }
+            return dirBlocked;
+        }
+
+        public static Processor.DirectoryProc getHomeDirectory(int dirBlock) {
+            if (dirBlock < p0_sharedmem_size)
+            {
+                return processors[0].dir;
+            }
+            else
+            {
+                //bloquear directorio de P1
+                return processors[1].dir;
             }
         }
 
@@ -152,22 +181,5 @@ namespace ProyectoArqui
             }
             else Console.ResetColor();
         }
-    }
-
-    class Directory
-    {
-
-        // Construye las dos matrices según la cantidad de bloques y caches ingresados
-        // Lleva dos matrices:
-        // - Una es de dimensiones 2 x cantBloques, lleva en cada fila la etiqueta del bloque y su estado
-        // - Otra es de dimensiones cantidadCaches x cantBloques, lleva en cada fila 
-        public Directory(int n_blocks, int n_caches)
-        {
-            block_state_matrix = new string[2, n_blocks];
-            caches_matrix = new Boolean[n_caches, n_blocks];
-        }
-
-        string[,] block_state_matrix;
-        Boolean[,] caches_matrix;
     }
 }
