@@ -212,8 +212,8 @@ namespace ProyectoArqui {
                 registers = newRegisterValues;
             }
 
-            // Saves current Context in auxiliary variable, dequeues and loads last Context in contextQueue
-            // Enqueues old Context in contextQueue
+            // Saves current Context in contextQueue
+            // Loads new Context
 
             public void contextSwitch(){
 

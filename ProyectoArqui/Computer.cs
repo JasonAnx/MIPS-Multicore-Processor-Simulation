@@ -15,6 +15,7 @@ namespace ProyectoArqui
         private static int clock, quantum;
         private static OperatingSystem OS = new OperatingSystem();
         /* public atr */
+        public static UserInterface userInterface = new UserInterface();
         public static Processor[] processors;
         public static Barrier bsync;
         public const int block_size = 4;
@@ -26,6 +27,10 @@ namespace ProyectoArqui
         static void Main(string[] args)
         {
             OperatingSystem.log("Started.");
+            // Ask user for quantum and slow mode
+            OS.userQuantum = userInterface.getUserQuantum();
+            OS.slowModeActivated = userInterface.getSlowModeActivated();
+
             processors = new Processor[2];
 
             processors[0] = new Processor( /*id*/ 0,/*n_cores*/ 2, /*instmem_size*/ 24, /*sharedmem_size*/ p0_sharedmem_size);
@@ -119,7 +124,8 @@ namespace ProyectoArqui
 
     class OperatingSystem
     {
-
+        public int userQuantum;
+        public bool slowModeActivated;
         public void allocateInstInMem()
         {
             for (int numProcessor = 0; numProcessor < 2; numProcessor++)
@@ -164,12 +170,14 @@ namespace ProyectoArqui
                 //Console.WriteLine(memoria.getBloque(5).word0.operation);
             }
         }
+
         public static void log(string s)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("[OS Message]: " + s);
             Console.ResetColor();
         }
+
         public static void logError(string s, bool halt = false)
         {
             Console.ForegroundColor = ConsoleColor.Red;
