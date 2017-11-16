@@ -169,7 +169,11 @@ namespace ProyectoArqui
 
             public Bloque getBloque(int indexBloque)
             {
-                return mem[indexBloque];
+                // TODO ask
+                lock (mem)
+                {
+                    return mem[indexBloque];
+                }
             }
 
 
