@@ -163,18 +163,19 @@ namespace ProyectoArqui
             {
                 return mem.Length;
             }
-            /*
-
+            
             public Bloque getBloque(int indexBloque) {
                 return mem[indexBloque];
-
             }
-            */
+           
 
         }
 
         public class DirectoryProc
         {
+            public enum dirStates { C, M, U }
+            int[] block_labels;
+            dirStates[] block_states;
             string[,] block_state_matrix;
             Boolean[,] caches_matrix;
             // Construye las dos matrices según la cantidad de bloques y caches ingresados
@@ -183,13 +184,19 @@ namespace ProyectoArqui
             // - Otra es de dimensiones cantidadCaches x cantBloques, lleva en cada fila 
             public DirectoryProc(int n_blocks, int n_caches)
             {
+                block_labels = new int[n_blocks];
+                block_states = new dirStates[n_blocks];
                 block_state_matrix = new string[2, n_blocks];
                 caches_matrix = new Boolean[n_caches, n_blocks];
             }
 
-            public string[,] getStateMatrix()
+            public int[] getLabels() {
+                return block_labels;
+            }
+
+            public dirStates[] getStates()
             {
-                return block_state_matrix;
+                return block_states;
             }
 
             public Boolean[,] getCacheMatrix()
@@ -298,8 +305,6 @@ namespace ProyectoArqui
                         c.log("Error: wrong block direction : " + dirBloque);
                         Environment.Exit(33);
                     }
-
-                    /*No entiendo esto*/
                     if (labelsOfInstrs[dirBloque] == dirBloque)
                     {
                         return instrsInCache[dirBloque].word[dirPalabra];
@@ -356,8 +361,7 @@ namespace ProyectoArqui
                     if (Computer.tryBlockHomeDirectory(dirBloque))
                     {
                         /* Se revisa el estado del bloque en el directorio*/
-                        if (Computer.getHomeDirectory(dirBloque).getStateMatrix()[dirBloque, 1] == "M")
-                        {
+                        if (Computer.getHomeDirectory(dirBloque).getStates()[dirBloque] == DirectoryProc.dirStates.M) {
                             /*Bloquear cache*/
                             /*Bloquear bus*/
                             /* Esto se supone que inserta el bloque en la memoria compartida*/
