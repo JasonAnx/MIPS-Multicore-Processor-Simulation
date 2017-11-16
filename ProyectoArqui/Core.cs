@@ -6,14 +6,18 @@ namespace ProyectoArqui
 {
     public partial class Processor
     {
-
         public partial class Core
         {
 
-            private string current_ctx_name;
+            Processor parent;
+            InstructionCache instructionsCache;
+            DataCache dataCache;
+            private int _coreId;
 
-            private int quantum = 5;
-            int pc = 0; // memory position of the next instruction to be fetched
+            Context currentContext;
+
+            public int getId() { return _coreId; }
+
             /// <summary>
             /// starts the execution of the threads
             /// controls the thread time/quantum and context change
@@ -21,15 +25,19 @@ namespace ProyectoArqui
             public void start()
             {
                 Console.WriteLine("Started Core  " + (_coreId + 1) + "/" + parent.getCoreCount() + " on Processor" + parent.id);
-                while (loadNewContext())
+                while (loadContext())
                 {
-
-                    while (0 < quantum)
+                    int cycles = -1;
+                    while (cycles++ < OperatingSystem.userQuantum)
                     {
-                        Instruction nxtIst = instructionsCache.fetchInstruction(0, this);
+                        Instruction nxtIst =
+                            instructionsCache.fetchInstruction(
+                                currentContext.instr_pointer,
+                                this
+                                );
                         execute_instruction(nxtIst);
                         Computer.bsync.SignalAndWait();
-                        Console.WriteLine("preses adf");
+                        Console.WriteLine("press any key to continue");
                         Console.ReadLine();
                     }
 
@@ -47,13 +55,18 @@ namespace ProyectoArqui
 
             public void saveCurrentContext()
             {
-                string ctxId = current_ctx_name;
-                int[] registerValues = registers;
-                // Todavia esto no se mide
+                int[] registerValues = new int[32];
+                Array.Copy(registers, 0, registerValues, 0, 32);//Guarda los registros
+                // Todavia esto no se mide, TODO
                 float currentThreadExecutionTime = 0;
-                bool threadIsFinalized = false;
 
-                Context currentContext = new Context(exec_instr_ptr, ctxId, currentThreadExecutionTime, registerValues, threadIsFinalized);
+                Context currentContext = new Context(
+                    this.currentContext.instr_pointer,
+                    this.currentContext.id,
+                    currentThreadExecutionTime,
+                    registerValues,
+                    this.currentContext.isFinalized
+                    );
                 parent.contextQueue.Enqueue(currentContext);
             }
 

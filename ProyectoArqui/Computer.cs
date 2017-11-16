@@ -12,7 +12,6 @@ namespace ProyectoArqui
         // atributes
         /* private atr */
         private static int clock, quantum;
-        private static OperatingSystem OS = new OperatingSystem();
         /* public atr */
         internal static Processor[] processors;
         public static UserInterface userInterface = new UserInterface();
@@ -28,7 +27,8 @@ namespace ProyectoArqui
         {
             OperatingSystem.log("Booting");
             // Ask user for quantum and slow mode
-            //OS.userQuantum = userInterface.getUserQuantum();
+            OperatingSystem.userQuantum = userInterface.getUserQuantum();
+            OperatingSystem.log("Quantum set to " + OperatingSystem.userQuantum);
             //OS.slowModeActivated = userInterface.getSlowModeActivated();
 
             processors = new Processor[2];
@@ -89,7 +89,7 @@ namespace ProyectoArqui
 
         public static void loadData()
         {
-            OS.allocateInstInMem();
+            OperatingSystem.allocateInstInMem();
         }
 
         public static void execute()
@@ -109,14 +109,16 @@ namespace ProyectoArqui
                 //bloquear directorio de P0
                 dirBlocked = true; /* si se logra*/
             }
-            else {
+            else
+            {
                 //bloquear directorio de P1
                 dirBlocked = true; /* si se logra*/
             }
             return dirBlocked;
         }
 
-        public static Processor.DirectoryProc getHomeDirectory(int dirBlock) {
+        public static Processor.DirectoryProc getHomeDirectory(int dirBlock)
+        {
             if (dirBlock < p0_sharedmem_size)
             {
                 return processors[0].dir;
