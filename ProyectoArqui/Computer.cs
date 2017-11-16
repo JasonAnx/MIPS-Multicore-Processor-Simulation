@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Threading;
 
 
@@ -9,14 +8,15 @@ namespace ProyectoArqui
     //        auto format (VS-only)
     class Computer
     {
-        
+
         // atributes
         /* private atr */
         private static int clock, quantum;
         private static OperatingSystem OS = new OperatingSystem();
         /* public atr */
+        internal static Processor[] processors;
         public static UserInterface userInterface = new UserInterface();
-        public static Processor[] processors;
+
         public static Barrier bsync;
         public const int block_size = 4;
         public const int p0_sharedmem_size = 16;
@@ -52,7 +52,16 @@ namespace ProyectoArqui
             loadData();
             execute();
 
-            var name = Console.ReadLine();
+            // link event on threads finish
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
+        }
+
+        static void OnProcessExit(object sender, EventArgs e)
+        {
+            Thread.Sleep(500);
+            Console.ResetColor();
+            OperatingSystem.log("Finished. Press any key to exit.");
+            Console.ReadLine();
         }
 
         /************************** MAIN **************************/
@@ -122,72 +131,4 @@ namespace ProyectoArqui
 
     }
 
-    class OperatingSystem
-    {
-        public int userQuantum;
-        public bool slowModeActivated;
-        public void allocateInstInMem()
-        {
-            for (int numProcessor = 0; numProcessor < 2; numProcessor++)
-            {
-                string folderPath = "p" + numProcessor;
-                string[] files = System.IO.Directory.GetFiles(folderPath);
-                foreach (string filePath in files)
-                {
-                    try
-                    {
-                        Console.WriteLine(filePath);
-                        string[] lines = File.ReadAllLines(filePath);
-                        for (int line = 0; line < lines.Length; line++)
-                        {
-                            string[] instructionParts = lines[line].Split(' ');
-                            Instruction inst = new Instruction(int.Parse(instructionParts[0]),
-                                                                int.Parse(instructionParts[1]),
-                                                                int.Parse(instructionParts[2]),
-                                                                int.Parse(instructionParts[3]));
-                            try
-                            {
-                                Computer.processors[numProcessor].isntrmem.insertInstr(inst);
-                            }
-                            catch
-                            {
-                                logError("Unable to insert instruction " + inst.printValue() +
-                                          " on instruction memory of processor " + numProcessor);
-                            }
-
-
-                        }
-                        //Console.WriteLine(memoria.getBloque(5).word0.operation);
-                    }
-                    catch (FileNotFoundException e)
-                    {
-                        logError("File not found: " + filePath);
-                        logError("Could not load program");
-                        Environment.Exit(11);
-                        //Console.WriteLine("An error occurred: '{0}'", e);
-                    }
-                }
-                //Console.WriteLine(memoria.getBloque(5).word0.operation);
-            }
-        }
-
-        public static void log(string s)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("[OS Message]: " + s);
-            Console.ResetColor();
-        }
-
-        public static void logError(string s, bool halt = false)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("[OS Message]: " + s);
-            if (halt)
-            {
-                Console.WriteLine("\tProgram Halted. Press any key to exit");
-                Console.ReadLine();
-            }
-            else Console.ResetColor();
-        }
-    }
 }
