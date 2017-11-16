@@ -27,6 +27,7 @@ namespace ProyectoArqui
                 Console.WriteLine("Started Core  " + (_coreId + 1) + "/" + parent.getCoreCount() + " on Processor" + parent.id);
                 while (loadContext())
                 {
+                    log("context loaded with ip " + currentContext.instr_pointer);
                     int cycles = -1;
                     while (cycles++ < OperatingSystem.userQuantum)
                     {
@@ -44,6 +45,12 @@ namespace ProyectoArqui
 
                 }
                 Computer.bsync.SignalAndWait();
+            }
+
+            public void log(string msg)
+            {
+                Console.Write("[Core " + (_coreId + 1) + " on Processor " + parent.id + "] > ");
+                Console.WriteLine(msg);
             }
 
             public void stop()
@@ -78,6 +85,7 @@ namespace ProyectoArqui
                 int arg2 = _instruction.argument2;
                 int arg3 = _instruction.argument3;
 
+                log("executing instruction " + _instruction.printValue());
                 switch (copOp)
                 {
 
