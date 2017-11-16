@@ -298,13 +298,13 @@ namespace ProyectoArqui
 
                 public Instruction fetchInstruction(int program_counter, Core c)
                 {
-                    // TODO
                     int dirBloque = program_counter / (Computer.block_size * 4);
+                    dirBloque %= 4;
                     int dirPalabra = program_counter % (Computer.block_size * 4) / instrsInCache.Length;
 
-                    if (dirBloque > labelsOfInstrs.Length)
+                    if (dirBloque > labelsOfInstrs.Length || dirBloque < 0)
                     {
-                        Console.WriteLine("error: wrong block direction : " + dirBloque);
+                        c.log("error: wrong block direction : " + dirBloque);
                         Environment.Exit(33);
                     }
                     Console.WriteLine("Core " + c.getId()+" proc "+c.parent.id);
