@@ -237,6 +237,8 @@ namespace ProyectoArqui
 
             // Loads last Context in Context queue
 
+            Queue<Context> fins = new Queue<Context>();
+
             public bool loadContext()
             {
                 // Loads last Context in Queue
@@ -247,6 +249,10 @@ namespace ProyectoArqui
                         Context loadedContext = (Context)parent.contextQueue.Dequeue();
                         // Only load register values for now
                         //int[] newRegisterValues = loadedContext.getRegisterValues();
+
+                        if (loadedContext.isFinalized) {
+                            return false;
+                        }
                         this.currentContext = loadedContext;
                         registers = loadedContext.getRegisterValues();
 

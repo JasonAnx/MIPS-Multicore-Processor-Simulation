@@ -109,9 +109,9 @@ namespace ProyectoArqui
 
         // Print core register values (32 int array) from Core 
 
-        public void printRegisterValues(int [] registers)
+        public void printRegisterValues(int[] registers, int Cid, int id)
         {
-            string r = "Register values from core " + ctxId + ": " + "\n";
+            string r = "Register values from core " + (Cid+1) + ", Proc " + id +" : "+ ctxId + ": " + "\n";
             for (int i = 0; i < registers.Length; i++)
             {
                 if (registers[i] != 0)

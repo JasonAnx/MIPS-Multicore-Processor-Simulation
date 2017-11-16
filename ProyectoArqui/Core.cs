@@ -28,7 +28,7 @@ namespace ProyectoArqui
                 while (loadContext())
                 {
                     int cycles = -1;
-                    while (cycles++ < OperatingSystem.userQuantum && !currentContext.isFinalized )
+                    while (cycles++ < OperatingSystem.userQuantum && !currentContext.isFinalized)
                     {
                         Instruction nxtIst =
                             instructionsCache.fetchInstruction(
@@ -39,18 +39,17 @@ namespace ProyectoArqui
                         execute_instruction(nxtIst);
 
                         // Print register values after each cycle
-                        currentContext.printRegisterValues(registers);
+                        currentContext.printRegisterValues(registers, _coreId, parent.id);
+                        //Console.WriteLine(parent.contextQueue.Count);
                         // Print register values after each cycle
 
 
                         Computer.bsync.SignalAndWait();
                     }
                     saveCurrentContext();
-                    if (currentContext.isFinalized)
-                    {
-                        Computer.bsync.RemoveParticipant();
-                        break;
-                    }
+                }
+                {
+                    Computer.bsync.RemoveParticipant();
                 }
                 //Computer.bsync.SignalAndWait();
             }
@@ -202,6 +201,8 @@ namespace ProyectoArqui
                         break;
                     case 63:
                         currentContext.isFinalized = true;
+                        currentContext.printRegisterValues(registers, getId(), parent.id);
+                        Console.ReadLine();
                         // End of this thread
                         // print statistics
                         // set as finished in context
