@@ -75,11 +75,16 @@ namespace ProyectoArqui
         // attrs
         string ctxId;
         public string id { get { return ctxId; } }
+
+        int instruction_pointer;
+        public int instr_pointer { get { return instruction_pointer; } }
+
         float threadExecutionTime;
 
         private int[] registerValues; //> Current thread register values 
+
         bool threadIsFinalized;
-        int instruction_pointer;
+        public bool isFinalized { get { return threadIsFinalized; } }
 
         //
         public Context(int instr_ptr, string threadId, float threadExecutionTime, int[] registerValues, bool threadIsFinalized)

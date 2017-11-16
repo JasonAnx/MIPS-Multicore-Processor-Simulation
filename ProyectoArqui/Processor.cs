@@ -215,12 +215,7 @@ namespace ProyectoArqui
         {
             // we used a partial class to define the class methods on another
             // file and so, keep this file shorter and more readable
-            private int _coreId;
-            public int getId() { return _coreId; }
-            private int exec_instr_ptr;
-            Processor parent;
-            InstructionCache instructionsCache;
-            DataCache dataCache;
+
 
             public int[] registers;
 
@@ -235,23 +230,27 @@ namespace ProyectoArqui
 
             // Loads last Context in Context queue
 
-            public bool loadNewContext()
+            public bool loadContext()
             {
                 // Loads last Context in Queue
                 lock (parent.contextQueue)
                 {
                     try
                     {
-                        Context newContext = (Context)parent.contextQueue.Dequeue();
+                        Context loadedContext = (Context)parent.contextQueue.Dequeue();
                         // Only load register values for now
-                        int[] newRegisterValues = newContext.getRegisterValues();
-                        registers = newRegisterValues;
-                        Console.WriteLine("Loaded Context " + newContext.id);
+                        //int[] newRegisterValues = loadedContext.getRegisterValues();
+                        //registers = newRegisterValues;
+                        this.currentContext = loadedContext;
+                        Console.WriteLine(
+                            "Loaded Context " + loadedContext.id +
+                            " on core " + this.getId() + " processor " + parent.id
+                            );
                         return true;
                     }
                     catch (InvalidOperationException e)
                     {
-                        Console.WriteLine("Contxt queue empty");
+                        Console.WriteLine("Contxt queue empty: " + e.HelpLink);
                         return false;
                     }
                 }
@@ -270,7 +269,7 @@ namespace ProyectoArqui
 
                 // Load new Context
 
-                loadNewContext();
+                loadContext();
             }
 
             // 
@@ -309,14 +308,22 @@ namespace ProyectoArqui
                     /*Aqui se supone que va el fallo de cache*/
                     else
                     {
-                        //dirPalabra = program_counter % c.parent.instrsInCache.getLength() / Computer.block_size;
-
-                        //instrsInCache
-                        //c.parent.isntrmem.
-                        return new Instruction();
+                        return c.miss(program_counter, c);
                     }
                 }
             }
+
+            public Instruction miss(int program_counter, Core c)
+            {
+                return new Instruction();
+                //dirPalabra = program_counter % c.parent.instrsInCache.getLength() / Computer.block_size;
+
+                //instrsInCache
+                //c.parent.isntrmem.
+            }
+
+
+
 
             public struct DataCache
             {

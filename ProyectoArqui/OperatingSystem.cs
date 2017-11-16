@@ -6,9 +6,9 @@ namespace ProyectoArqui
 
     class OperatingSystem
     {
-        public int userQuantum;
-        public bool slowModeActivated;
-        public void allocateInstInMem()
+        public static int userQuantum;
+        public static bool slowModeActivated;
+        public static void allocateInstInMem()
         {
             for (int numProcessor = 0; numProcessor < Computer.processors.Length; numProcessor++)
             {
