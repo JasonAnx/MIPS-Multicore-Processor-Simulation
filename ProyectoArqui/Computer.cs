@@ -26,10 +26,10 @@ namespace ProyectoArqui
         [STAThread]
         static void Main(string[] args)
         {
-            OperatingSystem.log("Started.");
+            OperatingSystem.log("Booting");
             // Ask user for quantum and slow mode
-            OS.userQuantum = userInterface.getUserQuantum();
-            OS.slowModeActivated = userInterface.getSlowModeActivated();
+            //OS.userQuantum = userInterface.getUserQuantum();
+            //OS.slowModeActivated = userInterface.getSlowModeActivated();
 
             processors = new Processor[2];
 
@@ -50,6 +50,7 @@ namespace ProyectoArqui
             OperatingSystem.log("There is a total of " + getGlobalCoreCount() + " cores in this virtual machine");
 
             loadData();
+            OperatingSystem.log("Starting Cores");
             execute();
 
             // link event on threads finish
