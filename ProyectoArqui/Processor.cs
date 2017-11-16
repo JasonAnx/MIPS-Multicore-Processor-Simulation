@@ -242,8 +242,25 @@ namespace ProyectoArqui {
                         instrsInCache[i] = new Bloque(Computer.block_size);
                         //llena todos las instrucciones de los bloques con -1
                         instrsInCache[i].generateErrorBloque();
+                        labelsOfInstrs[i] = -1;
                     }
+                } // EO constr
 
+                public Instruction fetchInstruction(int program_counter, Core c)
+                {
+                    // TODO
+                    int dirBloque = program_counter / Computer.block_size;
+                    int dirPalabra = program_counter % c.parent.isntrmem.getLength() / Computer.block_size;
+                    /*No entiendo esto*/
+                    if (labelsOfInstrs[dirBloque] == dirBloque)
+                    {
+                        return instrsInCache[dirBloque].word[dirPalabra];
+                    }
+                    /*Aqui se supone que va el fallo de cache*/
+                    else
+                    {
+                        return new Instruction();
+                    }
                 }
             }
 
@@ -268,21 +285,6 @@ namespace ProyectoArqui {
                         labelsOfInstrs[i] = -1;
                     }
                 } // EO constructor
-
-                public Instruction fetchInstruction(int program_counter, Core c) {
-                    // TODO
-                    int dirBloque = program_counter / Computer.block_size;
-                    int dirPalabra = program_counter % c.parent.isntrmem.getLength() / Computer.block_size;
-                    /*No entiendo esto*/
-                    if (labelsOfInstrs[dirBloque] == dirBloque)
-                    {
-                        return instrsInCache[dirBloque].word[dirPalabra];
-                    }
-                    /*Aqui se supone que va el fallo de cache*/
-                    else {
-                        return new Instruction();
-                    }
-                }
 
                 public void allocate(int dirBloque, Core c) {
                     /*Se supone que en esa función se deberia bloquear el directorio primero*/
