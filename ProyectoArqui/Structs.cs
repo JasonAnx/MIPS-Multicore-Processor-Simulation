@@ -73,7 +73,8 @@ namespace ProyectoArqui
     public struct Context
     {
         // attrs
-        int threadId;
+        string ctxId;
+        public string id { get { return ctxId; } }
         float threadExecutionTime;
 
         private int[] registerValues; //> Current thread register values 
@@ -81,19 +82,19 @@ namespace ProyectoArqui
         int instruction_pointer;
 
         //
-        public Context(int instr_ptr, int threadId, float threadExecutionTime, int[] registerValues, bool threadIsFinalized)
+        public Context(int instr_ptr, string threadId, float threadExecutionTime, int[] registerValues, bool threadIsFinalized)
         {
-            this.threadId = threadId;
+            this.ctxId = threadId;
             this.threadExecutionTime = threadExecutionTime;
             this.registerValues = registerValues;
             this.threadIsFinalized = threadIsFinalized;
             this.instruction_pointer = instr_ptr;
         }
 
-        public Context(int instr_ptr, int threadId)
+        public Context(int instr_ptr, string threadId)
         {
             instruction_pointer = instr_ptr;
-            this.threadId = threadId;
+            this.ctxId = threadId;
             threadExecutionTime = 0;
             registerValues = new int[32];
             this.threadIsFinalized = false;

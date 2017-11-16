@@ -3,7 +3,7 @@ using System.IO;
 
 namespace ProyectoArqui
 {
-  
+
     class OperatingSystem
     {
         public int userQuantum;
@@ -15,12 +15,11 @@ namespace ProyectoArqui
                 string folderPath = "p" + numProcessor;
                 string[] files = System.IO.Directory.GetFiles(folderPath);
                 int instr_ptr = 0;
-                int idx = 0;
                 foreach (string filePath in files)
                 {
                     try
                     {
-                        Console.Write(filePath+"> ");
+                        Console.Write(filePath + "> ");
                         string[] lines = File.ReadAllLines(filePath);
                         for (int line = 0; line < lines.Length; line++)
                         {
@@ -41,20 +40,23 @@ namespace ProyectoArqui
 
 
                         }
-                        Computer.processors[numProcessor].createContext(instr_ptr, idx);
-                        idx++;
+                        Computer.processors[numProcessor].createContext(instr_ptr * 4, filePath);
                         instr_ptr += lines.Length;
                         //Console.WriteLine(memoria.getBloque(5).word0.operation);
                     }
                     catch (FileNotFoundException e)
                     {
-                        logError("File not found: " + filePath);
+                        logError("File not found: " + e.FileName);
                         logError("Could not load program");
                         Environment.Exit(11);
                         //Console.WriteLine("An error occurred: '{0}'", e);
                     }
                 }
                 //Console.WriteLine(memoria.getBloque(5).word0.operation);
+                //Console.WriteLine("There's a total of " +
+                //    Computer.processors[numProcessor].contextQueue.Count +
+                //    " contexts on proc " + Computer.processors[numProcessor].id + " context queue"
+                //    );
             }
         }
 
@@ -72,7 +74,6 @@ namespace ProyectoArqui
             if (halt)
             {
                 Console.WriteLine("\tProgram Halted. Press any key to exit");
-                Console.ReadLine();
             }
             else Console.ResetColor();
         }

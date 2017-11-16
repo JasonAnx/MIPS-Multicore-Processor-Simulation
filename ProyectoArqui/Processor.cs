@@ -45,7 +45,7 @@ namespace ProyectoArqui
             return cores.Length;
         }
 
-        public void createContext(int ip, int thread_id)
+        public void createContext(int ip, string thread_id)
         {
             Context currentContext = new Context(ip, thread_id);
             contextQueue.Enqueue(currentContext);
@@ -224,29 +224,29 @@ namespace ProyectoArqui
                 dataCache = new DataCache(4);
             }
 
-            // Create a new Context struct, save current context and insert it in the contextQueue
-
-            public void saveCurrentContext()
-            {
-                int currentThreadId = getId();
-                int[] registerValues = registers;
-                // Todav¨ªa esto no se mide
-                float currentThreadExecutionTime = 0;
-                bool threadIsFinalized = false;
-
-                Context currentContext = new Context(exec_instr_ptr, currentThreadId, currentThreadExecutionTime, registerValues, threadIsFinalized);
-                parent.contextQueue.Enqueue(currentContext);
-            }
-
             // Loads last Context in Context queue
 
-            public void loadNewContext()
+            public bool loadNewContext()
             {
                 // Loads last Context in Queue
-                Context newContext = (Context)parent.contextQueue.Dequeue();
-                // Only load register values for now
-                int[] newRegisterValues = newContext.getRegisterValues();
-                registers = newRegisterValues;
+                lock (parent.contextQueue)
+                {
+                    try
+                    {
+                        Context newContext = (Context)parent.contextQueue.Dequeue();
+                        // Only load register values for now
+                        int[] newRegisterValues = newContext.getRegisterValues();
+                        registers = newRegisterValues;
+                        Console.WriteLine("Loaded Context " + newContext.id);
+                        return true;
+                    }
+                    catch (InvalidOperationException e)
+                    {
+                        Console.WriteLine("Contxt queue empty");
+                        return false;
+                    }
+                }
+
             }
 
             // Saves current Context in contextQueue

@@ -10,6 +10,8 @@ namespace ProyectoArqui
         public partial class Core
         {
 
+            private string current_ctx_name;
+
             private int quantum = 5;
             int pc = 0; // memory position of the next instruction to be fetched
             /// <summary>
@@ -18,25 +20,43 @@ namespace ProyectoArqui
             /// </summary>
             public void start()
             {
-                Console.WriteLine("Hello! from Core  " + (_coreId + 1) + "/" + parent.getCoreCount() + " on Processor" + parent.id);
-                while (  /*ctxQueue.loadThread()*/ true)
+                Console.WriteLine("Started Core  " + (_coreId + 1) + "/" + parent.getCoreCount() + " on Processor" + parent.id);
+                while (loadNewContext())
                 {
 
                     while (0 < quantum)
                     {
-                        Instruction nxtIst = instructionsCache.fetchInstruction(0,this);
+                        Instruction nxtIst = instructionsCache.fetchInstruction(0, this);
                         execute_instruction(nxtIst);
                         Computer.bsync.SignalAndWait();
+                        Console.WriteLine("preses adf");
+                        Console.ReadLine();
                     }
 
 
                 }
+                Computer.bsync.SignalAndWait();
             }
 
             public void stop()
             {
                 Computer.bsync.SignalAndWait();
             }
+
+            // Create a new Context struct, save current context and insert it in the contextQueue
+
+            public void saveCurrentContext()
+            {
+                string ctxId = current_ctx_name;
+                int[] registerValues = registers;
+                // Todavia esto no se mide
+                float currentThreadExecutionTime = 0;
+                bool threadIsFinalized = false;
+
+                Context currentContext = new Context(exec_instr_ptr, ctxId, currentThreadExecutionTime, registerValues, threadIsFinalized);
+                parent.contextQueue.Enqueue(currentContext);
+            }
+
             public void execute_instruction(Instruction _instruction)
             {
 
