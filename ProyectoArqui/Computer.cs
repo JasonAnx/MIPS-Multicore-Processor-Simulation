@@ -43,7 +43,9 @@ namespace ProyectoArqui
                 quantum--;
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("[Barrier Message]: Threads Syncronized");
+                Console.WriteLine("                   Press any key to continue");
                 Console.ResetColor();
+                Console.ReadLine();
             });
             checkBarrierIntegrity();
 

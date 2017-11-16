@@ -76,8 +76,7 @@ namespace ProyectoArqui
         string ctxId;
         public string id { get { return ctxId; } }
 
-        int instruction_pointer;
-        public int instr_pointer { get { return instruction_pointer; } }
+        public int instruction_pointer;
 
         float threadExecutionTime;
 

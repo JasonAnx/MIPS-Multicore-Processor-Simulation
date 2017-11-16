@@ -32,13 +32,12 @@ namespace ProyectoArqui
                     {
                         Instruction nxtIst =
                             instructionsCache.fetchInstruction(
-                                currentContext.instr_pointer,
+                                currentContext.instruction_pointer,
                                 this
                                 );
+                        currentContext.instruction_pointer += 4;
                         execute_instruction(nxtIst);
                         Computer.bsync.SignalAndWait();
-                        Console.WriteLine("press any key to continue");
-                        Console.ReadLine();
                     }
 
 
@@ -68,7 +67,7 @@ namespace ProyectoArqui
                 float currentThreadExecutionTime = 0;
 
                 Context currentContext = new Context(
-                    this.currentContext.instr_pointer,
+                    this.currentContext.instruction_pointer,
                     this.currentContext.id,
                     currentThreadExecutionTime,
                     registerValues,

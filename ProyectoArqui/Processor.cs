@@ -49,7 +49,10 @@ namespace ProyectoArqui
         {
             Context currentContext = new Context(ip, thread_id);
             contextQueue.Enqueue(currentContext);
-            Console.WriteLine("Created Context " + thread_id + " on processor " + id + " with pc " + currentContext.instr_pointer);
+            Console.WriteLine("Created Context " + thread_id +
+                " on processor " + id + " with pc " +
+                currentContext.instruction_pointer
+                );
         }
 
         //Methods
@@ -163,11 +166,12 @@ namespace ProyectoArqui
             {
                 return mem.Length;
             }
-            
-            public Bloque getBloque(int indexBloque) {
+
+            public Bloque getBloque(int indexBloque)
+            {
                 return mem[indexBloque];
             }
-           
+
 
         }
 
@@ -190,7 +194,8 @@ namespace ProyectoArqui
                 caches_matrix = new Boolean[n_caches, n_blocks];
             }
 
-            public int[] getLabels() {
+            public int[] getLabels()
+            {
                 return block_labels;
             }
 
@@ -297,35 +302,39 @@ namespace ProyectoArqui
                 public Instruction fetchInstruction(int program_counter, Core c)
                 {
                     int dirBloque = program_counter / (Computer.block_size * 4);
-                    dirBloque %= 4;
+                    int dirBloqueCache = dirBloque % 4;
                     int dirPalabra = program_counter % (Computer.block_size * 4) / instrsInCache.Length;
 
-                    if (dirBloque > labelsOfInstrs.Length || dirBloque < 0)
+                    if (dirBloqueCache > labelsOfInstrs.Length || dirBloqueCache < 0)
                     {
-                        c.log("Error: wrong block direction : " + dirBloque);
+                        c.log("Error: wrong block direction : " + dirBloqueCache);
                         Environment.Exit(33);
                     }
-                    if (labelsOfInstrs[dirBloque] == dirBloque)
+
+                    if (labelsOfInstrs[dirBloqueCache] == dirBloque)
                     {
-                        return instrsInCache[dirBloque].word[dirPalabra];
+                        return instrsInCache[dirBloqueCache].word[dirPalabra];
                     }
-                    /*Aqui se supone que va el fallo de cache*/
                     else
                     {
-                        return c.miss(program_counter, c);
+                        miss(program_counter, c);
+                        return instrsInCache[dirBloqueCache].word[dirPalabra];
                     }
+                }
+                public void miss(int program_counter, Core c)
+                {
+                    int dirBloque = program_counter / (Computer.block_size * 4);
+                    Bloque blk = c.parent.isntrmem.getBloque(dirBloque);
+
+                    int dirBloqueCache = dirBloque % 4;
+                    instrsInCache[dirBloqueCache] = blk;
+                    labelsOfInstrs[dirBloqueCache] = dirBloque;
+
+                    //instrsInCache
+                    //c.parent.isntrmem.
                 }
             }
 
-            public Instruction miss(int program_counter, Core c)
-            {
-                int dirBloque = program_counter / Computer.block_size*4;
-
-                return c.parent.isntrmem.getBloque(dirBloque);
-
-                //instrsInCache
-                //c.parent.isntrmem.
-            }
 
 
 
@@ -361,7 +370,8 @@ namespace ProyectoArqui
                     if (Computer.tryBlockHomeDirectory(dirBloque))
                     {
                         /* Se revisa el estado del bloque en el directorio*/
-                        if (Computer.getHomeDirectory(dirBloque).getStates()[dirBloque] == DirectoryProc.dirStates.M) {
+                        if (Computer.getHomeDirectory(dirBloque).getStates()[dirBloque] == DirectoryProc.dirStates.M)
+                        {
                             /*Bloquear cache*/
                             /*Bloquear bus*/
                             /* Esto se supone que inserta el bloque en la memoria compartida*/
