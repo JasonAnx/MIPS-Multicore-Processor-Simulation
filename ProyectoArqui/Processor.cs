@@ -49,7 +49,7 @@ namespace ProyectoArqui
         {
             Context currentContext = new Context(ip, thread_id);
             contextQueue.Enqueue(currentContext);
-            Console.WriteLine("Created Context " + thread_id + " on processor " + id + " with pc " + ip);
+            Console.WriteLine("Created Context " + thread_id + " on processor " + id + " with pc " + currentContext.instr_pointer);
         }
 
         //Methods
@@ -233,10 +233,11 @@ namespace ProyectoArqui
                         //int[] newRegisterValues = loadedContext.getRegisterValues();
                         //registers = newRegisterValues;
                         this.currentContext = loadedContext;
-                        Console.WriteLine(
-                            "Loaded Context " + loadedContext.id +
-                            " on core " + this.getId() + " processor " + parent.id
-                            );
+                        //log("context loaded with ip " + loadedContext.instr_pointer);
+                        //Console.WriteLine(
+                        //    "Loaded Context " + loadedContext.id +
+                        //    " on core " + this.getId() + " processor " + parent.id
+                        //    );
                         return true;
                     }
                     catch (InvalidOperationException e)
@@ -291,6 +292,13 @@ namespace ProyectoArqui
                     // TODO
                     int dirBloque = program_counter / (Computer.block_size * 4);
                     int dirPalabra = program_counter % (Computer.block_size * 4) / instrsInCache.Length;
+
+                    if (dirBloque > labelsOfInstrs.Length)
+                    {
+                        Console.WriteLine("error: wrong block direction : " + dirBloque);
+                        Environment.Exit(33);
+                    }
+
                     /*No entiendo esto*/
                     if (labelsOfInstrs[dirBloque] == dirBloque)
                     {
