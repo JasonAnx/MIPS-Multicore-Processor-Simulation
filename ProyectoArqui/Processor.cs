@@ -1,14 +1,16 @@
 using System;
 using System.IO;
 using System.Threading;
-using System.Collections;
+using System.Collections.Generic;
 
-namespace ProyectoArqui {
+namespace ProyectoArqui
+{
 
     /// <summary>
     /// Processor class, containing the Core, SharedMemory and InstructionMemory classes.
     /// </summary>
-    public partial class Processor {
+    public partial class Processor
+    {
 
         /// fields
         public InstructionMemory isntrmem;
@@ -19,30 +21,43 @@ namespace ProyectoArqui {
 
         private Core[] cores;
 
-        public Queue contextQueue;
+        public Queue<Context> contextQueue;
 
         public const int numCaches = 3;
 
         // constructor
-        public Processor(int _id, int n_cores, int isntrmem_size, int shrmem_size) {
+        public Processor(int _id, int n_cores, int isntrmem_size, int shrmem_size)
+        {
             id = _id;
             cores = new Core[n_cores];
-            for (int i = 0; i < cores.Length; i++) {
+            for (int i = 0; i < cores.Length; i++)
+            {
                 cores[i] = new Core(i, this);
             }
             isntrmem = new InstructionMemory(isntrmem_size);
             shrmem = new SharedMemory(shrmem_size, this);
             dir = new DirectoryProc(shrmem_size, numCaches);
+            contextQueue = new Queue<Context>();
         }
 
-        public int getCoreCount() {
+        public int getCoreCount()
+        {
             return cores.Length;
         }
 
+        public void createContext(int ip, string thread_id)
+        {
+            Context currentContext = new Context(ip, thread_id);
+            contextQueue.Enqueue(currentContext);
+            Console.WriteLine("Created Context " + thread_id + " on processor " + id + " with pc " + ip);
+        }
+
         //Methods
-        public void start() {
+        public void start()
+        {
             //Console.WriteLine("procesador " + id + "tiene " + cores.Length + "cores");
-            foreach (Core c in cores) {
+            foreach (Core c in cores)
+            {
                 Thread t = new Thread(new ThreadStart(c.start));
                 t.Start();
             }
@@ -50,7 +65,8 @@ namespace ProyectoArqui {
 
         // Intern Classes
 
-        public class SharedMemory {
+        public class SharedMemory
+        {
             private static Mutex mutex = new Mutex();
             static Bloque[] shMem;
             Processor parent;
@@ -58,41 +74,51 @@ namespace ProyectoArqui {
                Recordar que la memoria compartida de P0 es de 16 (0-15)
                y la de P1 es de 8 (16-23).  
             */
-            public SharedMemory(int sizeMem, Processor prnt) {
+            public SharedMemory(int sizeMem, Processor prnt)
+            {
                 parent = prnt;
                 shMem = new Bloque[sizeMem];
-                for (int i = 0; i < sizeMem; i++) {
+                for (int i = 0; i < sizeMem; i++)
+                {
                     shMem[i] = new Bloque(Computer.block_size);
                 }
             }
 
-            public Bloque getBloque(int numBloque) {
+            public Bloque getBloque(int numBloque)
+            {
                 Bloque returnBloque = new Bloque(Computer.block_size);
-                if (parent.id == 0 && numBloque < 16) {
+                if (parent.id == 0 && numBloque < 16)
+                {
                     returnBloque.setValue(shMem[numBloque]);
                 }
-                if (parent.id == 1 && numBloque >= 16) {
+                if (parent.id == 1 && numBloque >= 16)
+                {
                     returnBloque.setValue(shMem[numBloque - 16]);
 
                 }
-                if ((parent.id == 0 && numBloque >= 16) || (parent.id == 1 && numBloque < 16)) {
+                if ((parent.id == 0 && numBloque >= 16) || (parent.id == 1 && numBloque < 16))
+                {
                     Console.WriteLine("The Block " + numBloque + " does not belong to the shared memory of processor " + parent.id + ".");
                     returnBloque.generateErrorBloque();
                 }
                 return returnBloque;
             }
 
-            public bool insertBloque(int numBloque, Bloque block) {
+            public bool insertBloque(int numBloque, Bloque block)
+            {
                 bool inserted = false;
-                if (parent.id == 0 && numBloque < 16) {
+                if (parent.id == 0 && numBloque < 16)
+                {
                     shMem[numBloque].setValue(block);
                     inserted = true;
                 }
-                if (parent.id == 1 && numBloque >= 16) {
+                if (parent.id == 1 && numBloque >= 16)
+                {
                     shMem[numBloque - 16].setValue(block);
                     inserted = true;
                 }
-                if ((parent.id == 0 && numBloque >= 16) || (parent.id == 1 && numBloque < 16)) {
+                if ((parent.id == 0 && numBloque >= 16) || (parent.id == 1 && numBloque < 16))
+                {
                     Console.WriteLine("The Block " + numBloque + " does not belong to the shared memory of processor " + parent.id + ".");
                 }
                 return inserted;
@@ -100,16 +126,19 @@ namespace ProyectoArqui {
             }
         }
 
-        public class InstructionMemory {
+        public class InstructionMemory
+        {
             //Attributes
             Bloque[] mem;
             public int lastBlock;
             public int lastInstr;
 
             //Constructor
-            public InstructionMemory(int sizeMem) {
+            public InstructionMemory(int sizeMem)
+            {
                 mem = new Bloque[sizeMem];
-                for (int i = 0; i < sizeMem; i++) {
+                for (int i = 0; i < sizeMem; i++)
+                {
                     mem[i] = new Bloque(4);
                 }
                 lastBlock = 0;
@@ -117,8 +146,10 @@ namespace ProyectoArqui {
             }
 
             //Methods
-            public void insertInstr(Instruction instr) {
-                if (lastInstr > 3) {
+            public void insertInstr(Instruction instr)
+            {
+                if (lastInstr > 3)
+                {
                     lastInstr = 0;
                     lastBlock++;
                     if (lastBlock > mem.Length)
@@ -128,7 +159,8 @@ namespace ProyectoArqui {
                 lastInstr++;
             }
 
-            public int getLength() {
+            public int getLength()
+            {
                 return mem.Length;
             }
             /*
@@ -164,11 +196,13 @@ namespace ProyectoArqui {
                 return block_labels;
             }
 
-            public dirStates[] getStates() {
+            public dirStates[] getStates()
+            {
                 return block_states;
             }
 
-            public Boolean[,] getCacheMatrix() {
+            public Boolean[,] getCacheMatrix()
+            {
                 return caches_matrix;
             }
 
@@ -177,18 +211,21 @@ namespace ProyectoArqui {
         /// <summary>
         /// the Core of a Processor. 
         /// </summary>
-        public partial class Core {
+        public partial class Core
+        {
             // we used a partial class to define the class methods on another
             // file and so, keep this file shorter and more readable
             private int _coreId;
             public int getId() { return _coreId; }
+            private int exec_instr_ptr;
             Processor parent;
             InstructionCache instructionsCache;
             DataCache dataCache;
 
             public int[] registers;
 
-            public Core(int _id, Processor prnt) {
+            public Core(int _id, Processor prnt)
+            {
                 _coreId = _id;
                 parent = prnt;
                 registers = new int[32];
@@ -196,35 +233,36 @@ namespace ProyectoArqui {
                 dataCache = new DataCache(4);
             }
 
-            // Create a new Context struct, save current context and insert it in the contextQueue
-
-            public void saveCurrentContext()
-            {
-                int currentThreadId = getId();
-                int[] registerValues = registers;
-                // Todavia esto no se mide
-                float currentThreadExecutionTime = 0;
-                bool threadIsFinalized = false;
-
-                Context currentContext = new Context(currentThreadId, currentThreadExecutionTime, registerValues, threadIsFinalized);
-                parent.contextQueue.Enqueue(currentContext);
-            }
-
             // Loads last Context in Context queue
 
-            public void loadNewContext()
+            public bool loadNewContext()
             {
                 // Loads last Context in Queue
-                Context newContext = (Context)parent.contextQueue.Dequeue();
-                // Only load register values for now
-                int[] newRegisterValues = newContext.getRegisterValues();
-                registers = newRegisterValues;
+                lock (parent.contextQueue)
+                {
+                    try
+                    {
+                        Context newContext = (Context)parent.contextQueue.Dequeue();
+                        // Only load register values for now
+                        int[] newRegisterValues = newContext.getRegisterValues();
+                        registers = newRegisterValues;
+                        Console.WriteLine("Loaded Context " + newContext.id);
+                        return true;
+                    }
+                    catch (InvalidOperationException e)
+                    {
+                        Console.WriteLine("Contxt queue empty");
+                        return false;
+                    }
+                }
+
             }
 
-            // Saves current Context in auxiliary variable, dequeues and loads last Context in contextQueue
-            // Enqueues old Context in contextQueue
+            // Saves current Context in contextQueue
+            // Loads new Context
 
-            public void contextSwitch(){
+            public void contextSwitch()
+            {
 
                 // Store old Context
 
@@ -236,33 +274,59 @@ namespace ProyectoArqui {
             }
 
             // 
-            public struct InstructionCache {
+            public struct InstructionCache
+            {
                 Bloque[] instrsInCache;
                 int[] labelsOfInstrs;
 
-                public InstructionCache(int cacheSize) {
+                public InstructionCache(int cacheSize)
+                {
                     instrsInCache = new Bloque[cacheSize];
                     labelsOfInstrs = new int[cacheSize];
                     /* 
                        Inicializa las 4 Instrucciones (16 enteros) con 0s.
                        Inicializa las etiquetas de las 4 Instrucciones en direcciones no existentes (-1).
                      */
-                    for (int i = 0; i < cacheSize; i++) {
+                    for (int i = 0; i < cacheSize; i++)
+                    {
                         instrsInCache[i] = new Bloque(Computer.block_size);
                         //llena todos las instrucciones de los bloques con -1
                         instrsInCache[i].generateErrorBloque();
+                        labelsOfInstrs[i] = -1;
                     }
+                } // EO constr
 
+                public Instruction fetchInstruction(int program_counter, Core c)
+                {
+                    // TODO
+                    int dirBloque = program_counter / (Computer.block_size * 4);
+                    int dirPalabra = program_counter % (Computer.block_size * 4) / instrsInCache.Length;
+                    /*No entiendo esto*/
+                    if (labelsOfInstrs[dirBloque] == dirBloque)
+                    {
+                        return instrsInCache[dirBloque].word[dirPalabra];
+                    }
+                    /*Aqui se supone que va el fallo de cache*/
+                    else
+                    {
+                        //dirPalabra = program_counter % c.parent.instrsInCache.getLength() / Computer.block_size;
+
+                        //instrsInCache
+                        //c.parent.isntrmem.
+                        return new Instruction();
+                    }
                 }
             }
 
-            public struct DataCache {
+            public struct DataCache
+            {
                 enum states { shared, invalid, modified }
                 Bloque[] instrsInCache;
                 int[] labelsOfInstrs;
                 states[] statesOfInstrs;
 
-                public DataCache(int cacheSize) {
+                public DataCache(int cacheSize)
+                {
                     instrsInCache = new Bloque[cacheSize];
                     labelsOfInstrs = new int[cacheSize];
                     statesOfInstrs = new states[cacheSize];
@@ -271,31 +335,19 @@ namespace ProyectoArqui {
                        Inicializa los estados en Invalidos (I).
                        Inicializa las etiquetas de los 4 Bloques en direcciones no existentes (-1).
                      */
-                    for (int i = 0; i < cacheSize; i++) {
+                    for (int i = 0; i < cacheSize; i++)
+                    {
                         instrsInCache[i] = new Bloque(Computer.block_size);
                         statesOfInstrs[i] = states.invalid;
                         labelsOfInstrs[i] = -1;
                     }
                 } // EO constructor
 
-                public Instruction fetchInstruction(int program_counter, Core c) {
-                    // TODO
-                    int dirBloque = program_counter / Computer.block_size;
-                    int dirPalabra = program_counter % c.parent.isntrmem.getLength() / Computer.block_size;
-                    /*No entiendo esto*/
-                    if (labelsOfInstrs[dirBloque] == dirBloque)
-                    {
-                        return instrsInCache[dirBloque].word[dirPalabra];
-                    }
-                    /*Aqui se supone que va el fallo de cache*/
-                    else {
-                        return new Instruction();
-                    }
-                }
-
-                public void allocate(int dirBloque, Core c) {
+                public void allocate(int dirBloque, Core c)
+                {
                     /*Se supone que en esa función se deberia bloquear el directorio primero*/
-                    if (Computer.tryBlockHomeDirectory(dirBloque)) {
+                    if (Computer.tryBlockHomeDirectory(dirBloque))
+                    {
                         /* Se revisa el estado del bloque en el directorio*/
                         if (Computer.getHomeDirectory(dirBloque).getStates()[dirBloque] == DirectoryProc.dirStates.M) {
                             /*Bloquear cache*/
@@ -305,11 +357,13 @@ namespace ProyectoArqui {
                             statesOfInstrs[dirBloque] = states.shared;
                             instrsInCache[dirBloque] = c.parent.shrmem.getBloque(dirBloque);
                         }
-                        else {
+                        else
+                        {
                             /*En caso de que no este en estado M*/
                         }
                     }
-                    else {
+                    else
+                    {
                         /*En caso de que no pueda bloquear directorio*/
                     }
                 }
