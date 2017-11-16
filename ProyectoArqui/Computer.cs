@@ -57,6 +57,7 @@ namespace ProyectoArqui
 
             // link event on threads finish
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
+
         }
 
         static void OnProcessExit(object sender, EventArgs e)

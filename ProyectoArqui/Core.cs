@@ -37,12 +37,34 @@ namespace ProyectoArqui
                                 );
                         currentContext.instruction_pointer += 4;
                         execute_instruction(nxtIst);
+
+                        // Print register values after each cycle
+                        printRegisterValues();
+                        // Print register values after each cycle
+
+
                         Computer.bsync.SignalAndWait();
                     }
 
 
                 }
                 Computer.bsync.SignalAndWait();
+            }
+
+            // Print self register values (32 int array) from Core (for now in Core)
+            //TODO: Move to UserInterface
+
+            public void printRegisterValues()
+            {
+                int id = getId();   
+                string r = "Register values from core " + id.ToString() + ": " + "\n";
+                for (int i = 0; i < registers.Length; i++)
+                {
+                    //Console.Write("R" + i + ": " + registers[i] + " | ");
+                    r += "R" + i + ": " + registers[i] + " | ";
+                }
+                r += "\n" + "\n" + "-------------------------------------" + "\n";
+                Console.WriteLine(r);
             }
 
             public void log(string msg)
