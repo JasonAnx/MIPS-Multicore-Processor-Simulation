@@ -163,13 +163,11 @@ namespace ProyectoArqui
             {
                 return mem.Length;
             }
-            /*
-
+            
             public Bloque getBloque(int indexBloque) {
                 return mem[indexBloque];
-
             }
-            */
+           
 
         }
 
@@ -307,11 +305,6 @@ namespace ProyectoArqui
                         c.log("error: wrong block direction : " + dirBloque);
                         Environment.Exit(33);
                     }
-                    Console.WriteLine("Core " + c.getId()+" proc "+c.parent.id);
-                    Console.WriteLine("inst pointer "+dirBloque);
-                    Console.WriteLine("dirBloque "+dirBloque);
-                    Console.WriteLine("dirPalabra "+dirPalabra);
-                    Console.ReadLine();
                     if (labelsOfInstrs[dirBloque] == dirBloque)
                     {
                         return instrsInCache[dirBloque].word[dirPalabra];
