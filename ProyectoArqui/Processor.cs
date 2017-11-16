@@ -307,9 +307,7 @@ namespace ProyectoArqui
                         Console.WriteLine("error: wrong block direction : " + dirBloque);
                         Environment.Exit(33);
                     }
-
-                    /*No entiendo esto*/
-                    Console.WriteLine("Core " + c.getId());
+                    Console.WriteLine("Core " + c.getId()+" proc "+c.parent.id);
                     Console.WriteLine("inst pointer "+dirBloque);
                     Console.WriteLine("dirBloque "+dirBloque);
                     Console.WriteLine("dirPalabra "+dirPalabra);
