@@ -301,6 +301,11 @@ namespace ProyectoArqui
                     int dirBloque = program_counter / (Computer.block_size * 4);
                     int dirPalabra = program_counter % (Computer.block_size * 4) / instrsInCache.Length;
                     /*No entiendo esto*/
+                    Console.WriteLine("Core " + c.getId());
+                    Console.WriteLine("inst pointer "+dirBloque);
+                    Console.WriteLine("dirBloque "+dirBloque);
+                    Console.WriteLine("dirPalabra "+dirPalabra);
+                    Console.ReadLine();
                     if (labelsOfInstrs[dirBloque] == dirBloque)
                     {
                         return instrsInCache[dirBloque].word[dirPalabra];
