@@ -1,3 +1,5 @@
+using System;
+
 namespace ProyectoArqui
 {
 
@@ -104,6 +106,23 @@ namespace ProyectoArqui
             this.threadIsFinalized = false;
         }
         public int[] getRegisterValues() { return registerValues; }
+
+        // Print core register values (32 int array) from Core 
+
+        public void printRegisterValues(int [] registers)
+        {
+            string r = "Register values from core " + ctxId + ": " + "\n";
+            for (int i = 0; i < registers.Length; i++)
+            {
+                if (registers[i] != 0)
+                {
+                    //Console.Write("R" + i + ": " + registers[i] + " | ");
+                    r += "R" + i + ": " + registers[i] + " | ";
+                }
+            }
+            r += "\n" + "\n" + "-------------------------------------" + "\n";
+            Console.WriteLine(r);
+        }
     }
 
 
