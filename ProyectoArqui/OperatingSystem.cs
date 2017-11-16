@@ -10,15 +10,17 @@ namespace ProyectoArqui
         public bool slowModeActivated;
         public void allocateInstInMem()
         {
-            for (int numProcessor = 0; numProcessor < 2; numProcessor++)
+            for (int numProcessor = 0; numProcessor < Computer.processors.Length; numProcessor++)
             {
                 string folderPath = "p" + numProcessor;
                 string[] files = System.IO.Directory.GetFiles(folderPath);
+                int instr_ptr = 0;
+                int idx = 0;
                 foreach (string filePath in files)
                 {
                     try
                     {
-                        Console.WriteLine(filePath);
+                        Console.Write(filePath+"> ");
                         string[] lines = File.ReadAllLines(filePath);
                         for (int line = 0; line < lines.Length; line++)
                         {
@@ -39,6 +41,9 @@ namespace ProyectoArqui
 
 
                         }
+                        Computer.processors[numProcessor].createContext(instr_ptr, idx);
+                        idx++;
+                        instr_ptr += lines.Length;
                         //Console.WriteLine(memoria.getBloque(5).word0.operation);
                     }
                     catch (FileNotFoundException e)

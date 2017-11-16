@@ -1,4 +1,5 @@
-namespace ProyectoArqui {
+namespace ProyectoArqui
+{
 
     public struct Bloque
     {
@@ -14,8 +15,10 @@ namespace ProyectoArqui {
             return this.word[numInstr];
         }
 
-        public void generateErrorBloque() {
-            for (int i = 0; i < 4; i++) {
+        public void generateErrorBloque()
+        {
+            for (int i = 0; i < 4; i++)
+            {
                 word[i].operationCod = -1;
                 word[i].argument1 = -1;
                 word[i].argument2 = -1;
@@ -23,8 +26,10 @@ namespace ProyectoArqui {
             }
         }
 
-        public void setValue(Bloque bl) {
-            for (int i = 0; i < 4; i++) {
+        public void setValue(Bloque bl)
+        {
+            for (int i = 0; i < 4; i++)
+            {
                 this.word[i].setValue(bl.word[i]);
             }
         }
@@ -56,26 +61,42 @@ namespace ProyectoArqui {
 
         public string printValue()
         {
-            string values = operationCod.ToString()+" ";
-            values += argument1.ToString()+ " ";
-            values += argument2.ToString()+ " ";
+            string values = operationCod.ToString() + " ";
+            values += argument1.ToString() + " ";
+            values += argument2.ToString() + " ";
             values += argument3.ToString();
             return values;
         }
     }
 
 
-    public struct Context{
+    public struct Context
+    {
+        // attrs
         int threadId;
         float threadExecutionTime;
-        // Current thread register values 
-        private int[] registerValues;
+
+        private int[] registerValues; //> Current thread register values 
         bool threadIsFinalized;
-        public Context(int threadId, float threadExecutionTime, int[] registerValues, bool threadIsFinalized){
+        int instruction_pointer;
+
+        //
+        public Context(int instr_ptr, int threadId, float threadExecutionTime, int[] registerValues, bool threadIsFinalized)
+        {
             this.threadId = threadId;
             this.threadExecutionTime = threadExecutionTime;
             this.registerValues = registerValues;
             this.threadIsFinalized = threadIsFinalized;
+            this.instruction_pointer = instr_ptr;
+        }
+
+        public Context(int instr_ptr, int threadId)
+        {
+            instruction_pointer = instr_ptr;
+            this.threadId = threadId;
+            threadExecutionTime = 0;
+            registerValues = new int[32];
+            this.threadIsFinalized = false;
         }
         public int[] getRegisterValues() { return registerValues; }
     }
