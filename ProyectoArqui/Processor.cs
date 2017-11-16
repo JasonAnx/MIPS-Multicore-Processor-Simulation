@@ -295,7 +295,7 @@ namespace ProyectoArqui
 
                     if (dirBloque > labelsOfInstrs.Length || dirBloque < 0)
                     {
-                        c.log("error: wrong block direction : " + dirBloque);
+                        c.log("Error: wrong block direction : " + dirBloque);
                         Environment.Exit(33);
                     }
 
@@ -314,8 +314,9 @@ namespace ProyectoArqui
 
             public Instruction miss(int program_counter, Core c)
             {
-                return new Instruction();
-                //dirPalabra = program_counter % c.parent.instrsInCache.getLength() / Computer.block_size;
+                int dirBloque = program_counter / Computer.block_size*4;
+
+                return c.parent.isntrmem.getBloque(dirBloque);
 
                 //instrsInCache
                 //c.parent.isntrmem.
