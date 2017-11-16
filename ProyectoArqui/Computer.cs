@@ -29,7 +29,7 @@ namespace ProyectoArqui
             // Ask user for quantum and slow mode
             OperatingSystem.userQuantum = userInterface.getUserQuantum();
             OperatingSystem.log("Quantum set to " + OperatingSystem.userQuantum);
-            //OS.slowModeActivated = userInterface.getSlowModeActivated();
+            OperatingSystem.slowModeActivated = userInterface.getSlowModeActivated();
 
             processors = new Processor[2];
 
@@ -45,7 +45,7 @@ namespace ProyectoArqui
                 Console.WriteLine("[Barrier Message]: Threads Syncronized");
                 Console.WriteLine("                   Press any key to continue");
                 Console.ResetColor();
-                Console.ReadLine();
+                if (OperatingSystem.slowModeActivated) Console.ReadLine();
             });
             checkBarrierIntegrity();
 

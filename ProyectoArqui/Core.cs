@@ -28,7 +28,7 @@ namespace ProyectoArqui
                 while (loadContext())
                 {
                     int cycles = -1;
-                    while (cycles++ < OperatingSystem.userQuantum)
+                    while (cycles++ < OperatingSystem.userQuantum && !currentContext.isFinalized )
                     {
                         Instruction nxtIst =
                             instructionsCache.fetchInstruction(
@@ -45,10 +45,14 @@ namespace ProyectoArqui
 
                         Computer.bsync.SignalAndWait();
                     }
-
-
+                    saveCurrentContext();
+                    if (currentContext.isFinalized)
+                    {
+                        Computer.bsync.RemoveParticipant();
+                        break;
+                    }
                 }
-                Computer.bsync.SignalAndWait();
+                //Computer.bsync.SignalAndWait();
             }
 
             // Print self register values (32 int array) from Core (for now in Core)
@@ -189,6 +193,7 @@ namespace ProyectoArqui
                         if (registers[arg1] == 0)
                         {
                             //cP += arg3;
+                            currentContext.instruction_pointer += arg3;
                         }
                         break;
 
@@ -196,18 +201,23 @@ namespace ProyectoArqui
                         if (registers[arg1] != 0)
                         {
                             //cP += arg3;
+                            currentContext.instruction_pointer += arg3;
                         }
                         break;
 
                     case 3:
                         //registers[32] = cP;
+                        registers[31] = currentContext.instruction_pointer;
                         //cP += arg3 / 4;
+                        currentContext.instruction_pointer += arg3 / 4;
                         break;
 
                     case 2:
                         //cP = registers[arg1];
+                        currentContext.instruction_pointer = registers[arg1];
                         break;
                     case 63:
+                        currentContext.isFinalized = true;
                         // End of this thread
                         // print statistics
                         // set as finished in context

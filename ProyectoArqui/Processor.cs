@@ -247,8 +247,9 @@ namespace ProyectoArqui
                         Context loadedContext = (Context)parent.contextQueue.Dequeue();
                         // Only load register values for now
                         //int[] newRegisterValues = loadedContext.getRegisterValues();
-                        //registers = newRegisterValues;
                         this.currentContext = loadedContext;
+                        registers = loadedContext.getRegisterValues();
+
                         //log("context loaded with ip " + loadedContext.instr_pointer);
                         //Console.WriteLine(
                         //    "Loaded Context " + loadedContext.id +

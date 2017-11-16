@@ -83,7 +83,7 @@ namespace ProyectoArqui
         private int[] registerValues; //> Current thread register values 
 
         bool threadIsFinalized;
-        public bool isFinalized { get { return threadIsFinalized; } }
+        public bool isFinalized { get { return threadIsFinalized; } set { threadIsFinalized = value; } }
 
         //
         public Context(int instr_ptr, string threadId, float threadExecutionTime, int[] registerValues, bool threadIsFinalized)
