@@ -17,6 +17,9 @@ namespace ProyectoArqui
             Context currentContext;
 
             public int getId() { return _coreId; }
+            public int getParentId() { return parent.id; }
+
+
 
             /// <summary>
             /// starts the execution of the threads
@@ -39,14 +42,16 @@ namespace ProyectoArqui
                         execute_instruction(nxtIst);
 
                         // Print register values after each cycle
-                        currentContext.printRegisterValues(registers, _coreId, parent.id);
+
+                        log("Register values" + currentContext.registersToString());
                         //Console.WriteLine(parent.contextQueue.Count);
                         // Print register values after each cycle
 
 
                         Computer.bsync.SignalAndWait();
                     }
-                    saveCurrentContext();
+                    if (!currentContext.isFinalized)
+                        saveCurrentContext();
                 }
                 {
                     Computer.bsync.RemoveParticipant();
@@ -70,33 +75,38 @@ namespace ProyectoArqui
 
             public void saveCurrentContext()
             {
-                int[] registerValues = new int[32];
-                Array.Copy(registers, 0, registerValues, 0, 32);//Guarda los registros
-                // Todavia esto no se mide, TODO
-                float currentThreadExecutionTime = 0;
+                lock (parent.contextQueue)
+                {
 
-                Context currentContext = new Context(
-                    this.currentContext.instruction_pointer,
-                    this.currentContext.id,
-                    currentThreadExecutionTime,
-                    registerValues,
-                    this.currentContext.isFinalized
-                    );
-                parent.contextQueue.Enqueue(currentContext);
+                    int[] registerValues = new int[32];
+                    Array.Copy(registers, 0, registerValues, 0, 32);//Guarda los registros
+                                                                    // Todavia esto no se mide, TODO
+                    float currentThreadExecutionTime = 0;
+
+                    Context currentContext = new Context(
+                        this.currentContext.instruction_pointer,
+                        this.currentContext.id,
+                        currentThreadExecutionTime,
+                        registerValues,
+                        this.currentContext.isFinalized
+                        );
+                    parent.contextQueue.Enqueue(currentContext);
+
+                }
             }
 
-            public void execute_instruction(Instruction _instruction)
+            public void execute_instruction(Instruction itr)
             {
 
-                int copOp = _instruction.operationCod;
-                int arg1 = _instruction.argument1;
-                int arg2 = _instruction.argument2;
-                int arg3 = _instruction.argument3;
+                int opC = itr.operationCod;
+                int src = itr.argument1;
+                int sr2 = itr.argument2;
+                int imm = itr.argument3;
 
 
-                log("executing instruction " + _instruction.printValue());
+                log("executing instruction " + itr.printValue());
 
-                switch (copOp)
+                switch (opC)
                 {
 
                     case -1:
@@ -105,28 +115,28 @@ namespace ProyectoArqui
                         break;
                     /***** OPERACIONES ARITMETICAS BASICAS *****/
                     case 8:
-                        registers[arg2] = registers[arg1] + arg2;
+                        registers[sr2] = registers[src] + imm;
                         break;
                     case 32:
-                        registers[arg3] = registers[arg1] + registers[arg2];
+                        registers[imm] = registers[src] + registers[sr2];
                         break;
 
                     case 34:
-                        registers[arg3] = registers[arg1] - registers[arg2];
+                        registers[imm] = registers[src] - registers[sr2];
                         break;
 
                     case 12:
-                        registers[arg3] = registers[arg1] * registers[arg2];
+                        registers[imm] = registers[src] * registers[sr2];
                         break;
 
                     case 14:
-                        registers[arg3] = registers[arg1] / registers[arg2];
+                        registers[imm] = registers[src] / registers[sr2];
                         break;
                     /**** LOADS Y STORES ******/
 
                     case 35: //LW
 
-                        int memoryAddress = arg3 + registers[arg1];
+                        int memoryAddress = imm + registers[src];
 
                         int? datoLoad = 0;
                         /*   -->  
@@ -139,7 +149,7 @@ namespace ProyectoArqui
                         //con el fallo de caché ya resuelto                                        
                         if (datoLoad != null)
                         {
-                            registers[arg2] = ((int)datoLoad);
+                            registers[sr2] = ((int)datoLoad);
                         }
                         else
                         {
@@ -149,8 +159,8 @@ namespace ProyectoArqui
                         break;
                     case 43: //SW
 
-                        int posicionMemoriaStore = arg3 + registers[(arg1)];
-                        int datoEscribir = registers[(arg2)];
+                        int posicionMemoriaStore = imm + registers[(src)];
+                        int datoEscribir = registers[(sr2)];
 
                         bool datoStore = false;
                         //  datoStore = false;
@@ -172,44 +182,49 @@ namespace ProyectoArqui
 
 
                     /***BRANCHING Y DEMAS***/
-                    case 4:
-                        if (registers[arg1] == 0)
-                        {
-                            //cP += arg3;
-                            currentContext.instruction_pointer += arg3;
-                        }
+                    case 2:  // JR
+                        //cP = registers[src];
+                        currentContext.instruction_pointer = registers[src];
                         break;
 
-                    case 5:
-                        if (registers[arg1] != 0)
-                        {
-                            //cP += arg3;
-                            currentContext.instruction_pointer += arg3;
-                        }
-                        break;
+                    case 3:  // JAL
 
-                    case 3:
-                        //registers[32] = cP;
                         registers[31] = currentContext.instruction_pointer;
-                        //cP += arg3 / 4;
-                        currentContext.instruction_pointer += arg3 / 4;
+                        currentContext.instruction_pointer += imm;
                         break;
 
-                    case 2:
-                        //cP = registers[arg1];
-                        currentContext.instruction_pointer = registers[arg1];
+                    case 4:  // BEQZ
+                        if (registers[src] == 0)
+                        {
+                            //cP += imm;
+                            currentContext.instruction_pointer += imm * 4;
+                        }
                         break;
+
+                    case 5: // BNEZ 
+                        if (registers[src] != 0)
+                        {
+                            //cP += imm;
+                            currentContext.instruction_pointer += imm * 4;
+                        }
+                        break;
+
                     case 63:
                         currentContext.isFinalized = true;
-                        currentContext.printRegisterValues(registers, getId(), parent.id);
-                        Console.ReadLine();
+                        currentContext.printEnd(this);
+                        parent.archiveContext(currentContext);
+
+                        //Console.WriteLine("Press enter key to continue");
+                        //Console.ReadLine();
+
                         // End of this thread
                         // print statistics
                         // set as finished in context
                         break;
                     default:
-                        string reporter = "[Core  " + (_coreId + 1) + "/" + parent.getCoreCount() + " on Processor" + parent.id + "]";
-                        OperatingSystem.logError(reporter + " Error: Unknown Instruction opCode: " + copOp, true);
+                        string reporter = "[Core  " + (_coreId + 1) + "/" + parent.getCoreCount() +
+                            " on Processor" + parent.id + "]";
+                        OperatingSystem.logError(reporter + " Error: Unknown Instruction opCode: " + opC, true);
                         Environment.Exit(0);
                         break;
                 }

@@ -21,7 +21,9 @@ namespace ProyectoArqui
 
         private Core[] cores;
 
-        public Queue<Context> contextQueue;
+        public Queue<Context> contextQueue = new Queue<Context>();
+        public Queue<Context> finishedTds = new Queue<Context>();
+
 
         public const int numCaches = 3;
 
@@ -37,12 +39,27 @@ namespace ProyectoArqui
             isntrmem = new InstructionMemory(isntrmem_size);
             shrmem = new SharedMemory(shrmem_size, this);
             dir = new DirectoryProc(shrmem_size, numCaches);
-            contextQueue = new Queue<Context>();
         }
 
         public int getCoreCount()
         {
             return cores.Length;
+        }
+
+        public void archiveContext (Context ctx)
+        {
+            finishedTds.Enqueue(ctx);
+        }
+
+        public void printArchivedContexts()
+        {
+            string s = "";
+            while (finishedTds.Count > 0)
+            {
+                Context ct =  finishedTds.Dequeue();
+                s += ct.registersToString();
+            }
+            Console.WriteLine(s);
         }
 
         public void createContext(int ip, string thread_id)
@@ -230,14 +247,11 @@ namespace ProyectoArqui
             {
                 _coreId = _id;
                 parent = prnt;
-                registers = new int[32];
                 instructionsCache = new InstructionCache(4);
                 dataCache = new DataCache(4);
             }
 
             // Loads last Context in Context queue
-
-            Queue<Context> fins = new Queue<Context>();
 
             public bool loadContext()
             {
@@ -250,9 +264,6 @@ namespace ProyectoArqui
                         // Only load register values for now
                         //int[] newRegisterValues = loadedContext.getRegisterValues();
 
-                        if (loadedContext.isFinalized) {
-                            return false;
-                        }
                         this.currentContext = loadedContext;
                         registers = loadedContext.getRegisterValues();
 
@@ -265,7 +276,8 @@ namespace ProyectoArqui
                     }
                     catch (InvalidOperationException e)
                     {
-                        Console.WriteLine("Contxt queue empty: " + e.HelpLink);
+                        log("\t\t>> Contxt queue empty: " + e.HelpLink);
+                        //Console.ReadLine();
                         return false;
                     }
                 }

@@ -62,6 +62,11 @@ namespace ProyectoArqui
 
         static void OnProcessExit(object sender, EventArgs e)
         {
+            OperatingSystem.log("\nResults:");
+            foreach (Processor p in processors)
+            {
+                p.printArchivedContexts();
+            }
             Thread.Sleep(500);
             Console.ResetColor();
             OperatingSystem.log("Finished. Press any key to exit.");
