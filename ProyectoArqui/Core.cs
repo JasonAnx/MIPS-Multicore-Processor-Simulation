@@ -43,7 +43,6 @@ namespace ProyectoArqui
 
                         // Print register values after each cycle
 
-                        log("Register values" + currentContext.registersToString());
                         //Console.WriteLine(parent.contextQueue.Count);
                         // Print register values after each cycle
 
@@ -103,8 +102,11 @@ namespace ProyectoArqui
                 int sr2 = itr.argument2;
                 int imm = itr.argument3;
 
+                if (OperatingSystem.slowModeActivated)
 
-                log("executing instruction " + itr.printValue());
+                    log("executing instruction " + itr.toString() + "\n" +
+                    "Register values" + currentContext.registersToString()
+                    );
 
                 switch (opC)
                 {

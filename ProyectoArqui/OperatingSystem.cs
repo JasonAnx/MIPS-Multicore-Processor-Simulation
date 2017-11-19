@@ -44,7 +44,7 @@ namespace ProyectoArqui
                             }
                             catch
                             {
-                                logError("Unable to insert instruction " + inst.printValue() +
+                                logError("Unable to insert instruction " + inst.toString() +
                                           " on instruction memory of processor " + numProcessor);
                             }
 
