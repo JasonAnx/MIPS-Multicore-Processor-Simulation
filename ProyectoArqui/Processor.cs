@@ -24,8 +24,10 @@ namespace ProyectoArqui
         public Queue<Context> contextQueue = new Queue<Context>();
         public Queue<Context> finishedTds = new Queue<Context>();
 
-
         public const int numCaches = 3;
+        // number of blocks in a cache
+        public const int cacheSize = 4;
+
 
         // constructor
         public Processor(int _id, int n_cores, int isntrmem_size, int shrmem_size)
@@ -66,8 +68,9 @@ namespace ProyectoArqui
         {
             Context currentContext = new Context(ip, thread_id);
             contextQueue.Enqueue(currentContext);
-            Console.WriteLine("Created Context " + thread_id +
-                " on processor " + id + " with pc " +
+
+            Console.WriteLine("Created Context [" + thread_id +
+                "] on processor " + id + " with pc " +
                 currentContext.instruction_pointer
                 );
         }
@@ -250,8 +253,8 @@ namespace ProyectoArqui
             {
                 _coreId = _id;
                 parent = prnt;
-                instructionsCache = new InstructionCache(4);
-                dataCache = new DataCache(4);
+                instructionsCache = new InstructionCache();
+                dataCache = new DataCache();
             }
 
             // Loads last Context in Context queue
@@ -305,12 +308,12 @@ namespace ProyectoArqui
             // 
             public class InstructionCache
             {
-                Bloque<Instruction>[] instrsInCache;
+                Bloque<Instruction>[] blocks;
                 int[] labelsOfInstrs;
 
-                public InstructionCache(int cacheSize)
+                public InstructionCache()
                 {
-                    instrsInCache = new Bloque<Instruction>[cacheSize];
+                    blocks = new Bloque<Instruction>[cacheSize];
                     labelsOfInstrs = new int[cacheSize];
                     /* 
                        Inicializa las 4 Instrucciones (16 enteros) con 0s.
@@ -318,7 +321,7 @@ namespace ProyectoArqui
                      */
                     for (int i = 0; i < cacheSize; i++)
                     {
-                        instrsInCache[i] = new Bloque<Instruction>(Computer.block_size);
+                        blocks[i] = new Bloque<Instruction>(Computer.block_size);
                         //llena todos las instrucciones de los bloques con -1
                         //data[i].generateErrorBloque();
                         labelsOfInstrs[i] = -1;
@@ -329,7 +332,7 @@ namespace ProyectoArqui
                 {
                     int dirBloque = program_counter / (Computer.block_size * 4);
                     int dirBloqueCache = dirBloque % 4;
-                    int dirPalabra = program_counter % (Computer.block_size * 4) / instrsInCache.Length;
+                    int dirPalabra = program_counter % (Computer.block_size * 4) / blocks.Length;
 
                     if (dirBloqueCache > labelsOfInstrs.Length || dirBloqueCache < 0)
                     {
@@ -339,12 +342,12 @@ namespace ProyectoArqui
 
                     if (labelsOfInstrs[dirBloqueCache] == dirBloque)
                     {
-                        return instrsInCache[dirBloqueCache].word[dirPalabra];
+                        return blocks[dirBloqueCache].word[dirPalabra];
                     }
                     else
                     {
                         miss(program_counter, c);
-                        return instrsInCache[dirBloqueCache].word[dirPalabra];
+                        return blocks[dirBloqueCache].word[dirPalabra];
                     }
                 }
                 public void miss(int program_counter, Core c)
@@ -353,7 +356,7 @@ namespace ProyectoArqui
                     Bloque<Instruction> blk = c.parent.isntrmem.getBloque(dirBloque);
 
                     int dirBloqueCache = dirBloque % 4;
-                    instrsInCache[dirBloqueCache] = blk;
+                    blocks[dirBloqueCache] = blk;
                     labelsOfInstrs[dirBloqueCache] = dirBloque;
 
                     //data
@@ -372,7 +375,7 @@ namespace ProyectoArqui
                 int[] labelsOfInstrs;
                 states[] statesOfInstrs;
 
-                public DataCache(int cacheSize)
+                public DataCache()
                 {
                     data = new Bloque<int>[cacheSize];
                     labelsOfInstrs = new int[cacheSize];
