@@ -235,7 +235,7 @@ namespace ProyectoArqui
         /// <summary>
         /// the Core of a Processor. 
         /// </summary>
-        public partial class Core
+        private partial class Core
         {
             // we used a partial class to define the class methods on another
             // file and so, keep this file shorter and more readable
@@ -274,9 +274,9 @@ namespace ProyectoArqui
                         //    );
                         return true;
                     }
-                    catch (InvalidOperationException e)
+                    catch (InvalidOperationException )
                     {
-                        log("\t\t>> Contxt queue empty: " + e.HelpLink);
+                        //log("\t\t>> Contxt queue empty");
                         //Console.ReadLine();
                         return false;
                     }
@@ -300,7 +300,7 @@ namespace ProyectoArqui
             }
 
             // 
-            public struct InstructionCache
+            public class InstructionCache
             {
                 Bloque[] instrsInCache;
                 int[] labelsOfInstrs;
@@ -362,7 +362,7 @@ namespace ProyectoArqui
 
 
 
-            public struct DataCache
+            public class DataCache
             {
                 enum states { shared, invalid, modified }
                 Bloque[] instrsInCache;
