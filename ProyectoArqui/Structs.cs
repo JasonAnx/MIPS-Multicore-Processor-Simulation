@@ -124,11 +124,6 @@ namespace ProyectoArqui
             r += "\n" + "\n" + "-------------------------------------" + "\n";
             return r;
         }
-
-        public void printEnd(Processor.Core owner)
-        {
-            owner.log("Thread " + ctxId + " has finalized ");
-        }
     }
 
 

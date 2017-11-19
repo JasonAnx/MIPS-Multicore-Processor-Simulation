@@ -6,7 +6,7 @@ namespace ProyectoArqui
 {
     public partial class Processor
     {
-        public partial class Core
+        private partial class Core
         {
 
             Processor parent;
@@ -213,7 +213,7 @@ namespace ProyectoArqui
 
                     case 63:
                         currentContext.isFinalized = true;
-                        currentContext.printEnd(this);
+                        log("Thread " + currentContext.id + " has finalized ");
                         parent.archiveContext(currentContext);
 
                         //Console.WriteLine("Press enter key to continue");
