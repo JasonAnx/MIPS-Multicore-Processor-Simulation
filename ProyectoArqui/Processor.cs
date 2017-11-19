@@ -87,8 +87,7 @@ namespace ProyectoArqui
 
         public class SharedMemory
         {
-            private static Mutex mutex = new Mutex();
-            static Bloque[] shMem;
+            static Bloque<int>[] shMem;
             Processor parent;
             /* 
                Recordar que la memoria compartida de P0 es de 16 (0-15)
@@ -97,44 +96,48 @@ namespace ProyectoArqui
             public SharedMemory(int sizeMem, Processor prnt)
             {
                 parent = prnt;
-                shMem = new Bloque[sizeMem];
+                shMem = new Bloque<int>[sizeMem];
                 for (int i = 0; i < sizeMem; i++)
                 {
-                    shMem[i] = new Bloque(Computer.block_size);
+                    shMem[i] = new Bloque<int>(Computer.block_size);
                 }
             }
 
-            public Bloque getBloque(int numBloque)
+            public Bloque<int> getBloque(int numBloque)
             {
-                Bloque returnBloque = new Bloque(Computer.block_size);
+                Console.WriteLine("Fix this method");
+                Environment.Exit(67);
+                Bloque<int> returnBloque = new Bloque<int>(Computer.block_size);
                 if (parent.id == 0 && numBloque < 16)
                 {
-                    returnBloque.setValue(shMem[numBloque]);
+                    //returnBloque.setValue(shMem[numBloque]);
                 }
                 if (parent.id == 1 && numBloque >= 16)
                 {
-                    returnBloque.setValue(shMem[numBloque - 16]);
+                    //returnBloque.setValue(shMem[numBloque - 16]);
 
                 }
                 if ((parent.id == 0 && numBloque >= 16) || (parent.id == 1 && numBloque < 16))
                 {
                     Console.WriteLine("The Block " + numBloque + " does not belong to the shared memory of processor " + parent.id + ".");
-                    returnBloque.generateErrorBloque();
+                    //returnBloque.generateErrorBloque();
                 }
                 return returnBloque;
             }
 
-            public bool insertBloque(int numBloque, Bloque block)
+            public bool insertBloque(int numBloque, Bloque<int> block)
             {
+                Console.WriteLine("Fix this method");
+                Environment.Exit(68);
                 bool inserted = false;
                 if (parent.id == 0 && numBloque < 16)
                 {
-                    shMem[numBloque].setValue(block);
+                    //shMem[numBloque].setValue(block);
                     inserted = true;
                 }
                 if (parent.id == 1 && numBloque >= 16)
                 {
-                    shMem[numBloque - 16].setValue(block);
+                    //shMem[numBloque - 16].setValue(block);
                     inserted = true;
                 }
                 if ((parent.id == 0 && numBloque >= 16) || (parent.id == 1 && numBloque < 16))
@@ -149,17 +152,17 @@ namespace ProyectoArqui
         public class InstructionMemory
         {
             //Attributes
-            Bloque[] mem;
+            Bloque<Instruction>[] mem;
             public int lastBlock;
             public int lastInstr;
 
             //Constructor
             public InstructionMemory(int sizeMem)
             {
-                mem = new Bloque[sizeMem];
+                mem = new Bloque<Instruction>[sizeMem];
                 for (int i = 0; i < sizeMem; i++)
                 {
-                    mem[i] = new Bloque(4);
+                    mem[i] = new Bloque<Instruction>(4);
                 }
                 lastBlock = 0;
                 lastInstr = 0;
@@ -184,7 +187,7 @@ namespace ProyectoArqui
                 return mem.Length;
             }
 
-            public Bloque getBloque(int indexBloque)
+            public Bloque<Instruction> getBloque(int indexBloque)
             {
                 // TODO ask
                 lock (mem)
@@ -302,12 +305,12 @@ namespace ProyectoArqui
             // 
             public class InstructionCache
             {
-                Bloque[] instrsInCache;
+                Bloque<Instruction>[] instrsInCache;
                 int[] labelsOfInstrs;
 
                 public InstructionCache(int cacheSize)
                 {
-                    instrsInCache = new Bloque[cacheSize];
+                    instrsInCache = new Bloque<Instruction>[cacheSize];
                     labelsOfInstrs = new int[cacheSize];
                     /* 
                        Inicializa las 4 Instrucciones (16 enteros) con 0s.
@@ -315,9 +318,9 @@ namespace ProyectoArqui
                      */
                     for (int i = 0; i < cacheSize; i++)
                     {
-                        instrsInCache[i] = new Bloque(Computer.block_size);
+                        instrsInCache[i] = new Bloque<Instruction>(Computer.block_size);
                         //llena todos las instrucciones de los bloques con -1
-                        instrsInCache[i].generateErrorBloque();
+                        //data[i].generateErrorBloque();
                         labelsOfInstrs[i] = -1;
                     }
                 } // EO constr
@@ -347,13 +350,13 @@ namespace ProyectoArqui
                 public void miss(int program_counter, Core c)
                 {
                     int dirBloque = program_counter / (Computer.block_size * 4);
-                    Bloque blk = c.parent.isntrmem.getBloque(dirBloque);
+                    Bloque<Instruction> blk = c.parent.isntrmem.getBloque(dirBloque);
 
                     int dirBloqueCache = dirBloque % 4;
                     instrsInCache[dirBloqueCache] = blk;
                     labelsOfInstrs[dirBloqueCache] = dirBloque;
 
-                    //instrsInCache
+                    //data
                     //c.parent.isntrmem.
                 }
             }
@@ -365,13 +368,13 @@ namespace ProyectoArqui
             public class DataCache
             {
                 enum states { shared, invalid, modified }
-                Bloque[] instrsInCache;
+                Bloque<int>[] data;
                 int[] labelsOfInstrs;
                 states[] statesOfInstrs;
 
                 public DataCache(int cacheSize)
                 {
-                    instrsInCache = new Bloque[cacheSize];
+                    data = new Bloque<int>[cacheSize];
                     labelsOfInstrs = new int[cacheSize];
                     statesOfInstrs = new states[cacheSize];
                     /* 
@@ -381,7 +384,7 @@ namespace ProyectoArqui
                      */
                     for (int i = 0; i < cacheSize; i++)
                     {
-                        instrsInCache[i] = new Bloque(Computer.block_size);
+                        data[i] = new Bloque<int>(Computer.block_size);
                         statesOfInstrs[i] = states.invalid;
                         labelsOfInstrs[i] = -1;
                     }
@@ -398,9 +401,9 @@ namespace ProyectoArqui
                             /*Bloquear cache*/
                             /*Bloquear bus*/
                             /* Esto se supone que inserta el bloque en la memoria compartida*/
-                            c.parent.shrmem.insertBloque(dirBloque, instrsInCache[dirBloque]);
+                            c.parent.shrmem.insertBloque(dirBloque, data[dirBloque]);
                             statesOfInstrs[dirBloque] = states.shared;
-                            instrsInCache[dirBloque] = c.parent.shrmem.getBloque(dirBloque);
+                            data[dirBloque] = c.parent.shrmem.getBloque(dirBloque);
                         }
                         else
                         {

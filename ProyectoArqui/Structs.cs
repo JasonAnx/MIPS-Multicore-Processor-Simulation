@@ -3,38 +3,38 @@ using System;
 namespace ProyectoArqui
 {
 
-    public struct Bloque
+    public struct Bloque<T>
     {
-        public Instruction[] word;
+        public T[] word;
 
         public Bloque(int wordSize)
         {
-            word = new Instruction[wordSize];
+            word = new T[wordSize];
         }
 
-        public Instruction GetInstruction(int numInstr)
+        public T GetInstruction(int numInstr)
         {
             return this.word[numInstr];
         }
 
-        public void generateErrorBloque()
-        {
-            for (int i = 0; i < 4; i++)
-            {
-                word[i].operationCod = -1;
-                word[i].argument1 = -1;
-                word[i].argument2 = -1;
-                word[i].argument3 = -1;
-            }
-        }
+        //public void generateErrorBloque()
+        //{
+        //    for (int i = 0; i < 4; i++)
+        //    {
+        //        word[i].operationCod = -1;
+        //        word[i].argument1 = -1;
+        //        word[i].argument2 = -1;
+        //        word[i].argument3 = -1;
+        //    }
+        //}
 
-        public void setValue(Bloque bl)
-        {
-            for (int i = 0; i < 4; i++)
-            {
-                this.word[i].setValue(bl.word[i]);
-            }
-        }
+        //public void setValue(Bloque bl)
+        //{
+        //    for (int i = 0; i < 4; i++)
+        //    {
+        //        this.word[i].setValue(bl.word[i]);
+        //    }
+        //}
 
     }
 
