@@ -30,7 +30,7 @@ namespace ProyectoArqui
                 {
                     try
                     {
-                        Console.Write(filePath + "> ");
+                        //Console.Write(filePath + "> ");
                         string[] lines = File.ReadAllLines(filePath);
                         for (int line = 0; line < lines.Length; line++)
                         {
