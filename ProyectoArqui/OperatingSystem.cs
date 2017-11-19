@@ -13,7 +13,8 @@ namespace ProyectoArqui
         {
             string programPath = chooseProgramFolder();
 
-            if (programPath == null) {
+            if (programPath == null)
+            {
                 logError("");
                 Environment.Exit(66);
             }
@@ -85,8 +86,8 @@ namespace ProyectoArqui
 
             uint programIndex;
 
-            if (UInt32.TryParse(Console.ReadLine(), out programIndex)) ;
-            else return null;
+            if (!UInt32.TryParse(Console.ReadLine(), out programIndex))
+                return null;
 
             if (programIndex < dirs.Length)
             {
