@@ -24,12 +24,16 @@ namespace ProyectoArqui
         // Ask if user wants to run simulation in slow mode
 
         public bool getSlowModeActivated(){
-            Console.WriteLine("Run simulation in slow mode? (Y/N): ");
-            string slowMode = Console.ReadLine();
+            string slowMode = "";
             bool userSlowMode = false; // Default value: 0
-            if(slowMode == "Y" || slowMode == "N"){
-                if (slowMode == "Y") { userSlowMode = true; }
-                else { userSlowMode = false; }
+            while (slowMode != "Y" && slowMode != "y" && slowMode != "N" && slowMode != "n")
+            {
+                Console.WriteLine("Run simulation in slow mode? (Y/N): ");
+                slowMode = Console.ReadLine();
+                if (slowMode == "Y" || slowMode == "y")
+                {
+                    userSlowMode = true;
+                }
             }
             return userSlowMode;
         }
