@@ -8,11 +8,21 @@ namespace ProyectoArqui
     {
         public static int userQuantum;
         public static bool slowModeActivated;
+
         public static void allocateInstInMem()
         {
+            string programPath = chooseProgramFolder();
+
+            if (programPath == null) {
+                logError("");
+                Environment.Exit(66);
+            }
+
             for (int numProcessor = 0; numProcessor < Computer.processors.Length; numProcessor++)
             {
-                string folderPath = "p" + numProcessor;
+
+                string folderPath = programPath + "p" + numProcessor;
+
                 string[] files = System.IO.Directory.GetFiles(folderPath);
                 int instr_ptr = 0;
                 foreach (string filePath in files)
@@ -58,6 +68,31 @@ namespace ProyectoArqui
                 //    " contexts on proc " + Computer.processors[numProcessor].id + " context queue"
                 //    );
             }
+        }
+
+        private static string chooseProgramFolder()
+        {
+            string[] dirs = System.IO.Directory.GetDirectories(@"./programs");
+
+            string menu = "Programs found in this Computer> \n";
+            for (int i = 0; i < dirs.Length; i++)
+            {
+                menu += "\t[" + i + "] " + dirs[i].Replace("./programs", "") + "\n";
+            }
+
+            log(menu);
+            log("Enter the number of the program you want to run> ");
+
+            uint programIndex;
+
+            if (UInt32.TryParse(Console.ReadLine(), out programIndex)) ;
+            else return null;
+
+            if (programIndex < dirs.Length)
+            {
+                return dirs[(int)programIndex] + "/";
+            }
+            else return null;
         }
 
         public static void log(string s)

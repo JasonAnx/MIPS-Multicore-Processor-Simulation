@@ -26,15 +26,16 @@ namespace ProyectoArqui
         static void Main(string[] args)
         {
             OperatingSystem.log("Booting");
+            processors = new Processor[2];
+            processors[0] = new Processor( /*id*/ 0,/*n_cores*/ 2, /*instmem_size*/ 24, /*sharedmem_size*/ p0_sharedmem_size);
+            processors[1] = new Processor( /*id*/ 1,/*n_cores*/ 1, /*instmem_size*/ 16, /*sharedmem_size*/ p1_sharedmem_size);
+
+            OperatingSystem.log("There is a total of " + getGlobalCoreCount() + " cores in this virtual machine");
+
             // Ask user for quantum and slow mode
             OperatingSystem.userQuantum = userInterface.getUserQuantum();
             OperatingSystem.log("Quantum set to " + OperatingSystem.userQuantum);
             OperatingSystem.slowModeActivated = userInterface.getSlowModeActivated();
-
-            processors = new Processor[2];
-
-            processors[0] = new Processor( /*id*/ 0,/*n_cores*/ 2, /*instmem_size*/ 24, /*sharedmem_size*/ p0_sharedmem_size);
-            processors[1] = new Processor( /*id*/ 1,/*n_cores*/ 1, /*instmem_size*/ 16, /*sharedmem_size*/ p1_sharedmem_size);
 
             // Sync Barrier
             bsync = new Barrier(getGlobalCoreCount(), (b) =>
@@ -48,8 +49,6 @@ namespace ProyectoArqui
                 if (OperatingSystem.slowModeActivated) Console.ReadLine();
             });
             checkBarrierIntegrity();
-
-            OperatingSystem.log("There is a total of " + getGlobalCoreCount() + " cores in this virtual machine");
 
             loadData();
             OperatingSystem.log("Starting Cores");
