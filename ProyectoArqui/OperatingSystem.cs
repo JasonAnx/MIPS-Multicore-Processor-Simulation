@@ -73,12 +73,12 @@ namespace ProyectoArqui
 
         private static string chooseProgramFolder()
         {
-            string[] dirs = System.IO.Directory.GetDirectories(@"./programs");
+            string[] dirs = System.IO.Directory.GetDirectories(@".\programs");
 
             string menu = "Programs found in this Computer> \n";
             for (int i = 0; i < dirs.Length; i++)
             {
-                menu += "\t[" + i + "] " + dirs[i].Replace("./programs", "") + "\n";
+                menu += "\t[" + i + "] " + dirs[i].Replace(@".\programs", "") + "\n";
             }
 
             log(menu);
@@ -91,7 +91,7 @@ namespace ProyectoArqui
 
             if (programIndex < dirs.Length)
             {
-                return dirs[(int)programIndex] + "/";
+                return dirs[(int)programIndex] + @"\";
             }
             else return null;
         }
