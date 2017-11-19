@@ -105,23 +105,29 @@ namespace ProyectoArqui
             registerValues = new int[32];
             this.threadIsFinalized = false;
         }
+
         public int[] getRegisterValues() { return registerValues; }
 
         // Print core register values (32 int array) from Core 
 
-        public void printRegisterValues(int[] registers, int Cid, int id)
+        public string registersToString()
         {
-            string r = "Register values from core " + (Cid+1) + ", Proc " + id +" : "+ ctxId + ": " + "\n";
-            for (int i = 0; i < registers.Length; i++)
+            string r = ctxId + ": " + "\n";
+            for (int i = 0; i < registerValues.Length; i++)
             {
-                if (registers[i] != 0)
+                if (registerValues[i] != 0)
                 {
                     //Console.Write("R" + i + ": " + registers[i] + " | ");
-                    r += "R" + i + ": " + registers[i] + " | ";
+                    r += "R" + i + ": " + registerValues[i] + " | ";
                 }
             }
             r += "\n" + "\n" + "-------------------------------------" + "\n";
-            Console.WriteLine(r);
+            return r;
+        }
+
+        public void printEnd(Processor.Core owner)
+        {
+            owner.log("Thread " + ctxId + " has finalized ");
         }
     }
 
