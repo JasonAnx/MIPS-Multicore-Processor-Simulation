@@ -38,7 +38,7 @@ namespace ProyectoArqui
             }
             isntrmem = new InstructionMemory(isntrmem_size);
             shrmem = new SharedMemory(shrmem_size, this);
-            dir = new DirectoryProc(shrmem_size, numCaches);
+            dir = new DirectoryProc(shrmem_size, numCaches, this);
         }
 
         public int getCoreCount()
@@ -81,6 +81,11 @@ namespace ProyectoArqui
                 Thread t = new Thread(new ThreadStart(c.start));
                 t.Start();
             }
+        }
+
+        public Core getCore(int i)
+        {
+            return cores[i];
         }
 
         // Intern Classes
@@ -203,16 +208,20 @@ namespace ProyectoArqui
             dirStates[] block_states;
             string[,] block_state_matrix;
             Boolean[,] caches_matrix;
+            int n_caches;
+            Processor parent;
+
             // Construye las dos matrices según la cantidad de bloques y caches ingresados
             // Lleva dos matrices:
             // - Una es de dimensiones 2 x cantBloques, lleva en cada fila la etiqueta del bloque y su estado
             // - Otra es de dimensiones cantidadCaches x cantBloques, lleva en cada fila 
-            public DirectoryProc(int n_blocks, int n_caches)
+            public DirectoryProc(int n_blocks, int n_caches, Processor prnt)
             {
+                parent = prnt;
+                this.n_caches = n_caches;
                 block_labels = new int[n_blocks];
                 block_states = new dirStates[n_blocks];
-                block_state_matrix = new string[2, n_blocks];
-                caches_matrix = new Boolean[n_caches, n_blocks];
+                caches_matrix = new Boolean[n_caches, n_blocks]; 
             }
 
             public int[] getLabels()
@@ -229,7 +238,34 @@ namespace ProyectoArqui
             {
                 return caches_matrix;
             }
+            // Set specific cache row to false in caches matrix
+            public void setCacheMatrixToFalse(int dirBloque)
+            {
+                for (int i = 0; i < n_caches; i++)
+                {
+                    caches_matrix[dirBloque, i] = false;
+                }
+            }
+            // Set state to U
+            public void setUState(int dirBloque)
+            {
+                block_states[dirBloque] = dirStates.U;
+            }
 
+            public Processor getParent() {
+                return parent;
+            }
+
+            public int getCacheWithBlock(int dirBloque)
+            {
+                int i = 0;
+                while (i < n_caches) {
+                    if (caches_matrix[dirBloque, i] == true) {
+                        return i;
+                    }
+                }
+                return -1;
+            }
         }
 
         /// <summary>
@@ -299,6 +335,8 @@ namespace ProyectoArqui
                 loadContext();
             }
 
+
+
             // 
             public struct InstructionCache
             {
@@ -362,18 +400,18 @@ namespace ProyectoArqui
 
 
 
-            public struct DataCache
+            public class DataCache
             {
                 enum states { shared, invalid, modified }
-                Bloque[] instrsInCache;
-                int[] labelsOfInstrs;
-                states[] statesOfInstrs;
+                Bloque[] wordsInCache;
+                int[] labelsOfWords;
+                states[] statesOfWords;
 
                 public DataCache(int cacheSize)
                 {
-                    instrsInCache = new Bloque[cacheSize];
-                    labelsOfInstrs = new int[cacheSize];
-                    statesOfInstrs = new states[cacheSize];
+                    wordsInCache = new Bloque[cacheSize];
+                    labelsOfWords = new int[cacheSize];
+                    statesOfWords = new states[cacheSize];
                     /* 
                        Inicializa los 4 Bloques con 0s.
                        Inicializa los estados en Invalidos (I).
@@ -381,37 +419,97 @@ namespace ProyectoArqui
                      */
                     for (int i = 0; i < cacheSize; i++)
                     {
-                        instrsInCache[i] = new Bloque(Computer.block_size);
-                        statesOfInstrs[i] = states.invalid;
-                        labelsOfInstrs[i] = -1;
+                        wordsInCache[i] = new Bloque(Computer.block_size);
+                        statesOfWords[i] = states.invalid;
+                        labelsOfWords[i] = -1;
                     }
                 } // EO constructor
 
-                public void allocate(int dirBloque, Core c)
+
+                public Instruction fetchData(int program_counter, Core c)
                 {
-                    /*Se supone que en esa función se deberia bloquear el directorio primero*/
-                    if (Computer.tryBlockHomeDirectory(dirBloque))
+                    int dirBloque = program_counter / (Computer.block_size * 4);
+                    int dirBloqueCache = dirBloque % 4;
+                    int dirPalabra = program_counter % (Computer.block_size * 4) / wordsInCache.Length;
+
+                    // TODO: Request exclusive access to cache (block cache)
+                    // cambiar nombre de inst in cache
+                    lock (this.wordsInCache)
                     {
-                        /* Se revisa el estado del bloque en el directorio*/
-                        if (Computer.getHomeDirectory(dirBloque).getStates()[dirBloque] == DirectoryProc.dirStates.M)
+                        // Area critica
+                        if (dirBloqueCache > labelsOfWords.Length || dirBloqueCache < 0)
                         {
-                            /*Bloquear cache*/
-                            /*Bloquear bus*/
-                            /* Esto se supone que inserta el bloque en la memoria compartida*/
-                            c.parent.shrmem.insertBloque(dirBloque, instrsInCache[dirBloque]);
-                            statesOfInstrs[dirBloque] = states.shared;
-                            instrsInCache[dirBloque] = c.parent.shrmem.getBloque(dirBloque);
+                            c.log("Error: wrong block direction : " + dirBloqueCache);
+                            Environment.Exit(33);
                         }
-                        else
+
+                        if (labelsOfWords[dirBloqueCache] == dirBloque) // hit
                         {
-                            /*En caso de que no este en estado M*/
+                            return wordsInCache[dirBloqueCache].word[dirPalabra];
+                        }
+                        else // miss
+                        {
+                            miss(program_counter, c);
+                            return wordsInCache[dirBloqueCache].word[dirPalabra];
                         }
                     }
-                    else
-                    {
-                        /*En caso de que no pueda bloquear directorio*/
-                    }
+                    //Access to cache granted:
+
+
                 }
+
+                public void miss(int program_counter, Core c)
+                {
+                    int dirBloque = program_counter / (Computer.block_size * 4);
+                    int dirBloqueCache = dirBloque % 4;
+
+                    if (statesOfWords[dirBloqueCache] == states.modified ||
+                       statesOfWords[dirBloqueCache] == states.shared)
+                    {
+                        // Block the home directory of the victim block
+                        lock (Computer.getHomeDirectory(dirBloque))
+                        {
+                            //+40 or +16
+                            c.parent.shrmem.insertBloque(dirBloque, wordsInCache[dirBloqueCache]);
+                            Computer.getHomeDirectory(dirBloque).setCacheMatrixToFalse(dirBloque);
+                            Computer.getHomeDirectory(dirBloque).setUState(dirBloque);
+                        }
+                    }
+                    // Allocate
+                    lock (Computer.getHomeDirectory(dirBloque)) {
+                        /*Se supone que esto devuelve el indice de la matriz de bools donde hay un true
+                         Esto, para poder acceder a la cache
+                         */
+                        int numCache = Computer.getHomeDirectory(dirBloque).getCacheWithBlock(dirBloque);
+                        /*Se supoe que esto revisa si el bloque está M es esa cache*/
+                        if (c.parent.getCore(numCache).dataCache.statesOfWords[dirBloqueCache] == states.modified) {
+                            /*Bloquea la cache de datos que tenga el bloque*/
+                            lock (c.parent.getCore(numCache).dataCache) {
+                                /*Guarda el bloque desde la cache bloqueda a la cache compartida*/
+                                c.parent.shrmem.insertBloque(dirBloque, c.parent.getCore(numCache).dataCache.wordsInCache[dirBloqueCache]);
+                                /*Cambia el estado de bloque guardado a shared en la cache compartida*/
+                                c.parent.getCore(numCache).dataCache.statesOfWords[dirBloqueCache] = states.shared;
+                            }
+                        }
+                        /*guarda en MI cache el bloque desde memoria compartida*/
+                        wordsInCache[dirBloqueCache] = c.parent.shrmem.getBloque(dirBloque);
+                    }
+
+
+                    ////// codigo viejo
+                    /*
+                    int dirBloque = program_counter / (Computer.block_size * 4);
+                    Bloque blk = c.parent.isntrmem.getBloque(dirBloque);
+
+                    int dirBloqueCache = dirBloque % 4;
+                    instrsInCache[dirBloqueCache] = blk;
+                    labelsOfInstrs[dirBloqueCache] = dirBloque;
+
+                    //instrsInCache
+                    //c.parent.isntrmem.
+                    */
+                }
+
             }
 
         }
