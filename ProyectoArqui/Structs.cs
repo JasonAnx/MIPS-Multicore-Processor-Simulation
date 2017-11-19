@@ -61,7 +61,7 @@ namespace ProyectoArqui
             argument3 = instr.argument3;
         }
 
-        public string printValue()
+        public string toString()
         {
             string values = operationCod.ToString() + " ";
             values += argument1.ToString() + " ";
