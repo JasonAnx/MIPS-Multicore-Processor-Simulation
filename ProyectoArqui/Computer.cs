@@ -62,6 +62,7 @@ namespace ProyectoArqui
 
         static void OnProcessExit(object sender, EventArgs e)
         {
+            OperatingSystem.log("\nResults:");
             foreach (Processor p in processors)
             {
                 p.printArchivedContexts();
