@@ -271,6 +271,10 @@ namespace ProyectoArqui
                 }
                 return -1;
             }
+            // Set specific matrix position to true
+            public void setNStateTrue(int numCache, int dirBloque){
+                caches_matrix[numCache, dirBloque] = true;
+            }
         }
 
         /// <summary>
