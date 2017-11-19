@@ -448,7 +448,9 @@ namespace ProyectoArqui
                             Environment.Exit(33);
                         }
 
-                        if (labelsOfWords[dirBloqueCache] == dirBloque) // hit
+                        if (labelsOfWords[dirBloqueCache] == dirBloque &&
+                            statesOfWords[dirBloqueCache] != states.invalid
+                            ) // hit
                         {
                             return data[dirBloqueCache].word[dirPalabra];
                         }
@@ -493,7 +495,36 @@ namespace ProyectoArqui
                         }
                         /*guarda en mi cache el bloque desde memoria compartida*/
                         data[dirBloqueCache] = c.parent.shrmem.getBloque(dirBloque);
+                        statesOfWords[dirBloqueCache] = states.shared;
                     }
+                }
+
+                public int storeData(int program_counter, Core c)
+                {
+                    int dirBloque = program_counter / (Computer.block_size * 4);
+                    int dirBloqueCache = dirBloque % 4;
+                    int dirPalabra = program_counter % (Computer.block_size * 4) / data.Length;
+
+                    lock (data)
+                    {
+                        // Area critica
+                        if (dirBloqueCache > data.Length || dirBloqueCache < 0)
+                        {
+                            c.log("Error: wrong block direction : " + dirBloqueCache);
+                            Environment.Exit(33);
+                        }
+
+                        if (labelsOfWords[dirBloqueCache] == dirBloque) // hit
+                        {
+                            return data[dirBloqueCache].word[dirPalabra];
+                        }
+                        else // miss
+                        {
+                            miss(program_counter, c);
+                            return data[dirBloqueCache].word[dirPalabra];
+                        }
+                    }
+
                 }
 
             }
