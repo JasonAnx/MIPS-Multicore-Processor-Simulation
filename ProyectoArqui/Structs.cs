@@ -3,39 +3,44 @@ using System;
 namespace ProyectoArqui
 {
 
-    public struct Bloque
+    public struct Bloque<T>
     {
-        public Instruction[] word;
+        public T[] word;
 
         public Bloque(int wordSize)
         {
-            word = new Instruction[wordSize];
+            word = new T[wordSize];
         }
 
-        public Instruction GetInstruction(int numInstr)
+        public T GetInstruction(int numInstr)
         {
             return this.word[numInstr];
         }
 
-        public void generateErrorBloque()
-        {
+        //public void generateErrorBloque()
+        //{
+        //    for (int i = 0; i < 4; i++)
+        //    {
+        //        word[i].operationCod = -1;
+        //        word[i].argument1 = -1;
+        //        word[i].argument2 = -1;
+        //        word[i].argument3 = -1;
+        //    }
+        //}
+
+        //public void setValue(Bloque bl)
+        //{
+        //    for (int i = 0; i < 4; i++)
+        //    {
+        //        this.word[i].setValue(bl.word[i]);
+        //    }
+        //}
+        public void setValue(Bloque<T> bl) {
             for (int i = 0; i < 4; i++)
             {
-                word[i].operationCod = -1;
-                word[i].argument1 = -1;
-                word[i].argument2 = -1;
-                word[i].argument3 = -1;
+                this.word[i] = bl.word[i];
             }
         }
-
-        public void setValue(Bloque bl)
-        {
-            for (int i = 0; i < 4; i++)
-            {
-                this.word[i].setValue(bl.word[i]);
-            }
-        }
-
     }
 
     public struct Instruction
@@ -61,7 +66,7 @@ namespace ProyectoArqui
             argument3 = instr.argument3;
         }
 
-        public string printValue()
+        public string toString()
         {
             string values = operationCod.ToString() + " ";
             values += argument1.ToString() + " ";
@@ -123,11 +128,6 @@ namespace ProyectoArqui
             }
             r += "\n" + "\n" + "-------------------------------------" + "\n";
             return r;
-        }
-
-        public void printEnd(Processor.Core owner)
-        {
-            owner.log("Thread " + ctxId + " has finalized ");
         }
     }
 

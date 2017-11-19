@@ -6,7 +6,7 @@ namespace ProyectoArqui
 {
     public partial class Processor
     {
-        public partial class Core
+        private partial class Core
         {
 
             Processor parent;
@@ -43,7 +43,6 @@ namespace ProyectoArqui
 
                         // Print register values after each cycle
 
-                        log("Register values" + currentContext.registersToString());
                         //Console.WriteLine(parent.contextQueue.Count);
                         // Print register values after each cycle
 
@@ -103,8 +102,11 @@ namespace ProyectoArqui
                 int sr2 = itr.argument2;
                 int imm = itr.argument3;
 
+                if (OperatingSystem.slowModeActivated)
 
-                log("executing instruction " + itr.printValue());
+                    log("executing instruction " + itr.toString() + "\n" +
+                    "Register values" + currentContext.registersToString()
+                    );
 
                 switch (opC)
                 {
@@ -138,7 +140,7 @@ namespace ProyectoArqui
 
                         int memoryAddress = imm + registers[src];
 
-                        int? datoLoad = 0;
+                        int? datoLoad = dataCache.fetchData(memoryAddress, this);
                         /*   -->  
                          *   datoLoad =
                             traer de cacheDatos (  memoryAddress % 4, memoryAddress / 16 );
@@ -211,7 +213,7 @@ namespace ProyectoArqui
 
                     case 63:
                         currentContext.isFinalized = true;
-                        currentContext.printEnd(this);
+                        log("Thread " + currentContext.id + " has finalized ");
                         parent.archiveContext(currentContext);
 
                         //Console.WriteLine("Press enter key to continue");

@@ -13,7 +13,8 @@ namespace ProyectoArqui
         {
             string programPath = chooseProgramFolder();
 
-            if (programPath == null) {
+            if (programPath == null)
+            {
                 logError("");
                 Environment.Exit(66);
             }
@@ -44,7 +45,7 @@ namespace ProyectoArqui
                             }
                             catch
                             {
-                                logError("Unable to insert instruction " + inst.printValue() +
+                                logError("Unable to insert instruction " + inst.toString() +
                                           " on instruction memory of processor " + numProcessor);
                             }
 
@@ -72,12 +73,12 @@ namespace ProyectoArqui
 
         private static string chooseProgramFolder()
         {
-            string[] dirs = System.IO.Directory.GetDirectories(@"./programs");
+            string[] dirs = System.IO.Directory.GetDirectories(@".\programs");
 
             string menu = "Programs found in this Computer> \n";
             for (int i = 0; i < dirs.Length; i++)
             {
-                menu += "\t[" + i + "] " + dirs[i].Replace("./programs", "") + "\n";
+                menu += "\t[" + i + "] " + dirs[i].Replace(@".\programs", "") + "\n";
             }
 
             log(menu);
@@ -85,12 +86,12 @@ namespace ProyectoArqui
 
             uint programIndex;
 
-            if (UInt32.TryParse(Console.ReadLine(), out programIndex)) ;
-            else return null;
+            if (!UInt32.TryParse(Console.ReadLine(), out programIndex))
+                return null;
 
             if (programIndex < dirs.Length)
             {
-                return dirs[(int)programIndex] + "/";
+                return dirs[(int)programIndex] + @"\";
             }
             else return null;
         }

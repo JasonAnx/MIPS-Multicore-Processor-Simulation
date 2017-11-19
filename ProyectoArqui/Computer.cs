@@ -42,11 +42,14 @@ namespace ProyectoArqui
             {
                 clock++;
                 quantum--;
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("[Barrier Message]: Threads Syncronized");
-                Console.WriteLine("                   Press any key to continue");
-                Console.ResetColor();
-                if (OperatingSystem.slowModeActivated) Console.ReadLine();
+                if (OperatingSystem.slowModeActivated)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("[Barrier Message]: Threads Syncronized");
+                    Console.WriteLine("                   Press any key to continue");
+                    Console.ResetColor();
+                    Console.ReadLine();
+                }
             });
             checkBarrierIntegrity();
 
@@ -61,12 +64,11 @@ namespace ProyectoArqui
 
         static void OnProcessExit(object sender, EventArgs e)
         {
-            OperatingSystem.log("\nResults:");
+            OperatingSystem.log(" --- Results ---");
             foreach (Processor p in processors)
             {
                 p.printArchivedContexts();
             }
-            Thread.Sleep(500);
             Console.ResetColor();
             OperatingSystem.log("Finished. Press any key to exit.");
             Console.ReadLine();
@@ -136,8 +138,6 @@ namespace ProyectoArqui
                 return processors[1].dir;
             }
         }
-
-
 
     }
 

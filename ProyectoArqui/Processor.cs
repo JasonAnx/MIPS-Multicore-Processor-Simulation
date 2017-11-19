@@ -83,17 +83,11 @@ namespace ProyectoArqui
             }
         }
 
-        public Core getCore(int i)
-        {
-            return cores[i];
-        }
-
         // Intern Classes
 
         public class SharedMemory
         {
-            private static Mutex mutex = new Mutex();
-            static Bloque[] shMem;
+            static Bloque<int>[] shMem;
             Processor parent;
             /* 
                Recordar que la memoria compartida de P0 es de 16 (0-15)
@@ -102,16 +96,20 @@ namespace ProyectoArqui
             public SharedMemory(int sizeMem, Processor prnt)
             {
                 parent = prnt;
-                shMem = new Bloque[sizeMem];
+                shMem = new Bloque<int>[sizeMem];
                 for (int i = 0; i < sizeMem; i++)
                 {
-                    shMem[i] = new Bloque(Computer.block_size);
+                    shMem[i] = new Bloque<int>(Computer.block_size);
+                    shMem[i].word[0] = 1;
+                    shMem[i].word[1] = 1;
+                    shMem[i].word[2] = 1;
+                    shMem[i].word[3] = 1;
                 }
             }
 
-            public Bloque getBloque(int numBloque)
+            public Bloque<int> getBloque(int numBloque)
             {
-                Bloque returnBloque = new Bloque(Computer.block_size);
+                Bloque<int> returnBloque = new Bloque<int>(Computer.block_size);
                 if (parent.id == 0 && numBloque < 16)
                 {
                     returnBloque.setValue(shMem[numBloque]);
@@ -123,13 +121,16 @@ namespace ProyectoArqui
                 }
                 if ((parent.id == 0 && numBloque >= 16) || (parent.id == 1 && numBloque < 16))
                 {
-                    Console.WriteLine("The Block " + numBloque + " does not belong to the shared memory of processor " + parent.id + ".");
-                    returnBloque.generateErrorBloque();
+                    //Console.WriteLine("The Block " + numBloque + " does not belong to the shared memory of processor " + parent.id + ".");
+                    returnBloque.word[0] = 1;
+                    returnBloque.word[1] = 1;
+                    returnBloque.word[2] = 1;
+                    returnBloque.word[3] = 1;
                 }
                 return returnBloque;
             }
 
-            public bool insertBloque(int numBloque, Bloque block)
+            public bool insertBloque(int numBloque, Bloque<int> block)
             {
                 bool inserted = false;
                 if (parent.id == 0 && numBloque < 16)
@@ -142,10 +143,10 @@ namespace ProyectoArqui
                     shMem[numBloque - 16].setValue(block);
                     inserted = true;
                 }
-                if ((parent.id == 0 && numBloque >= 16) || (parent.id == 1 && numBloque < 16))
+                /*if ((parent.id == 0 && numBloque >= 16) || (parent.id == 1 && numBloque < 16))
                 {
                     Console.WriteLine("The Block " + numBloque + " does not belong to the shared memory of processor " + parent.id + ".");
-                }
+                }*/
                 return inserted;
 
             }
@@ -154,17 +155,17 @@ namespace ProyectoArqui
         public class InstructionMemory
         {
             //Attributes
-            Bloque[] mem;
+            Bloque<Instruction>[] mem;
             public int lastBlock;
             public int lastInstr;
 
             //Constructor
             public InstructionMemory(int sizeMem)
             {
-                mem = new Bloque[sizeMem];
+                mem = new Bloque<Instruction>[sizeMem];
                 for (int i = 0; i < sizeMem; i++)
                 {
-                    mem[i] = new Bloque(4);
+                    mem[i] = new Bloque<Instruction>(4);
                 }
                 lastBlock = 0;
                 lastInstr = 0;
@@ -189,7 +190,7 @@ namespace ProyectoArqui
                 return mem.Length;
             }
 
-            public Bloque getBloque(int indexBloque)
+            public Bloque<Instruction> getBloque(int indexBloque)
             {
                 // TODO ask
                 lock (mem)
@@ -211,7 +212,7 @@ namespace ProyectoArqui
             int n_caches;
             Processor parent;
 
-            // Construye las dos matrices según la cantidad de bloques y caches ingresados
+            // Construye las dos matrices segï¿½n la cantidad de bloques y caches ingresados
             // Lleva dos matrices:
             // - Una es de dimensiones 2 x cantBloques, lleva en cada fila la etiqueta del bloque y su estado
             // - Otra es de dimensiones cantidadCaches x cantBloques, lleva en cada fila 
@@ -256,13 +257,14 @@ namespace ProyectoArqui
                 return parent;
             }
 
-            public int getCacheWithBlock(int dirBloque)
+            public int getIdOfCacheWithBlock(int dirBloque)
             {
                 int i = 0;
                 while (i < n_caches) {
                     if (caches_matrix[dirBloque, i] == true) {
                         return i;
                     }
+                    i++;
                 }
                 return -1;
             }
@@ -271,7 +273,7 @@ namespace ProyectoArqui
         /// <summary>
         /// the Core of a Processor. 
         /// </summary>
-        public partial class Core
+        private partial class Core
         {
             // we used a partial class to define the class methods on another
             // file and so, keep this file shorter and more readable
@@ -310,9 +312,9 @@ namespace ProyectoArqui
                         //    );
                         return true;
                     }
-                    catch (InvalidOperationException e)
+                    catch (InvalidOperationException )
                     {
-                        log("\t\t>> Contxt queue empty: " + e.HelpLink);
+                        //log("\t\t>> Contxt queue empty");
                         //Console.ReadLine();
                         return false;
                     }
@@ -338,14 +340,14 @@ namespace ProyectoArqui
 
 
             // 
-            public struct InstructionCache
+            public class InstructionCache
             {
-                Bloque[] instrsInCache;
+                Bloque<Instruction>[] instrsInCache;
                 int[] labelsOfInstrs;
 
                 public InstructionCache(int cacheSize)
                 {
-                    instrsInCache = new Bloque[cacheSize];
+                    instrsInCache = new Bloque<Instruction>[cacheSize];
                     labelsOfInstrs = new int[cacheSize];
                     /* 
                        Inicializa las 4 Instrucciones (16 enteros) con 0s.
@@ -353,9 +355,9 @@ namespace ProyectoArqui
                      */
                     for (int i = 0; i < cacheSize; i++)
                     {
-                        instrsInCache[i] = new Bloque(Computer.block_size);
+                        instrsInCache[i] = new Bloque<Instruction>(Computer.block_size);
                         //llena todos las instrucciones de los bloques con -1
-                        instrsInCache[i].generateErrorBloque();
+                        //data[i].generateErrorBloque();
                         labelsOfInstrs[i] = -1;
                     }
                 } // EO constr
@@ -385,13 +387,13 @@ namespace ProyectoArqui
                 public void miss(int program_counter, Core c)
                 {
                     int dirBloque = program_counter / (Computer.block_size * 4);
-                    Bloque blk = c.parent.isntrmem.getBloque(dirBloque);
+                    Bloque<Instruction> blk = c.parent.isntrmem.getBloque(dirBloque);
 
                     int dirBloqueCache = dirBloque % 4;
                     instrsInCache[dirBloqueCache] = blk;
                     labelsOfInstrs[dirBloqueCache] = dirBloque;
 
-                    //instrsInCache
+                    //data
                     //c.parent.isntrmem.
                 }
             }
@@ -403,41 +405,41 @@ namespace ProyectoArqui
             public class DataCache
             {
                 enum states { shared, invalid, modified }
-                Bloque[] wordsInCache;
+                Bloque<int>[] data;
                 int[] labelsOfWords;
                 states[] statesOfWords;
 
                 public DataCache(int cacheSize)
                 {
-                    wordsInCache = new Bloque[cacheSize];
+                    data = new Bloque<int>[cacheSize];
                     labelsOfWords = new int[cacheSize];
                     statesOfWords = new states[cacheSize];
                     /* 
-                       Inicializa los 4 Bloques con 0s.
+                       Inicializa los Bloques con 0s.
                        Inicializa los estados en Invalidos (I).
                        Inicializa las etiquetas de los 4 Bloques en direcciones no existentes (-1).
                      */
                     for (int i = 0; i < cacheSize; i++)
                     {
-                        wordsInCache[i] = new Bloque(Computer.block_size);
+                        data[i] = new Bloque<int>(Computer.block_size);
                         statesOfWords[i] = states.invalid;
                         labelsOfWords[i] = -1;
                     }
                 } // EO constructor
 
 
-                public Instruction fetchData(int program_counter, Core c)
+                public int fetchData(int program_counter, Core c)
                 {
                     int dirBloque = program_counter / (Computer.block_size * 4);
                     int dirBloqueCache = dirBloque % 4;
-                    int dirPalabra = program_counter % (Computer.block_size * 4) / wordsInCache.Length;
+                    int dirPalabra = program_counter % (Computer.block_size * 4) / data.Length;
 
                     // TODO: Request exclusive access to cache (block cache)
                     // cambiar nombre de inst in cache
-                    lock (this.wordsInCache)
+                    lock (data)
                     {
                         // Area critica
-                        if (dirBloqueCache > labelsOfWords.Length || dirBloqueCache < 0)
+                        if (dirBloqueCache > data.Length || dirBloqueCache < 0)
                         {
                             c.log("Error: wrong block direction : " + dirBloqueCache);
                             Environment.Exit(33);
@@ -445,17 +447,15 @@ namespace ProyectoArqui
 
                         if (labelsOfWords[dirBloqueCache] == dirBloque) // hit
                         {
-                            return wordsInCache[dirBloqueCache].word[dirPalabra];
+                            return data[dirBloqueCache].word[dirPalabra];
                         }
                         else // miss
                         {
                             miss(program_counter, c);
-                            return wordsInCache[dirBloqueCache].word[dirPalabra];
+                            return data[dirBloqueCache].word[dirPalabra];
                         }
                     }
                     //Access to cache granted:
-
-
                 }
 
                 public void miss(int program_counter, Core c)
@@ -470,44 +470,27 @@ namespace ProyectoArqui
                         lock (Computer.getHomeDirectory(dirBloque))
                         {
                             //+40 or +16
-                            c.parent.shrmem.insertBloque(dirBloque, wordsInCache[dirBloqueCache]);
-                            Computer.getHomeDirectory(dirBloque).setCacheMatrixToFalse(dirBloque);
-                            Computer.getHomeDirectory(dirBloque).setUState(dirBloque);
+                            c.parent.shrmem.insertBloque(dirBloque, data[dirBloqueCache]);
+                            Computer.getHomeDirectory(dirBloqueCache).setCacheMatrixToFalse(dirBloqueCache);
+                            Computer.getHomeDirectory(dirBloqueCache).setUState(dirBloqueCache);
                         }
                     }
                     // Allocate
-                    lock (Computer.getHomeDirectory(dirBloque)) {
-                        /*Se supone que esto devuelve el indice de la matriz de bools donde hay un true
-                         Esto, para poder acceder a la cache
-                         */
-                        int numCache = Computer.getHomeDirectory(dirBloque).getCacheWithBlock(dirBloque);
-                        /*Se supoe que esto revisa si el bloque está M es esa cache*/
-                        if (c.parent.getCore(numCache).dataCache.statesOfWords[dirBloqueCache] == states.modified) {
+                    lock (Computer.getHomeDirectory(dirBloqueCache)) {
+                        /*Se supoe que esto revisa si el estado del bloque en el dir es M*/
+                        if (Computer.getHomeDirectory(dirBloqueCache).getStates()[dirBloqueCache] == DirectoryProc.dirStates.M) {
+                            int numCache = Computer.getHomeDirectory(dirBloqueCache).getIdOfCacheWithBlock(dirBloqueCache);
                             /*Bloquea la cache de datos que tenga el bloque*/
-                            lock (c.parent.getCore(numCache).dataCache) {
+                            lock (c.parent.cores[numCache].dataCache) {
                                 /*Guarda el bloque desde la cache bloqueda a la cache compartida*/
-                                c.parent.shrmem.insertBloque(dirBloque, c.parent.getCore(numCache).dataCache.wordsInCache[dirBloqueCache]);
+                                c.parent.shrmem.insertBloque(dirBloque, c.parent.cores[numCache].dataCache.data[dirBloqueCache]);
                                 /*Cambia el estado de bloque guardado a shared en la cache compartida*/
-                                c.parent.getCore(numCache).dataCache.statesOfWords[dirBloqueCache] = states.shared;
+                                c.parent.cores[numCache].dataCache.statesOfWords[dirBloqueCache] = states.shared;
                             }
                         }
-                        /*guarda en MI cache el bloque desde memoria compartida*/
-                        wordsInCache[dirBloqueCache] = c.parent.shrmem.getBloque(dirBloque);
+                        /*guarda en mi cache el bloque desde memoria compartida*/
+                        data[dirBloqueCache] = c.parent.shrmem.getBloque(dirBloque);
                     }
-
-
-                    ////// codigo viejo
-                    /*
-                    int dirBloque = program_counter / (Computer.block_size * 4);
-                    Bloque blk = c.parent.isntrmem.getBloque(dirBloque);
-
-                    int dirBloqueCache = dirBloque % 4;
-                    instrsInCache[dirBloqueCache] = blk;
-                    labelsOfInstrs[dirBloqueCache] = dirBloque;
-
-                    //instrsInCache
-                    //c.parent.isntrmem.
-                    */
                 }
 
             }
