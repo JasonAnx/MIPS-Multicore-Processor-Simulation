@@ -439,7 +439,7 @@ namespace ProyectoArqui
 
                     // TODO: Request exclusive access to cache (block cache)
                     // cambiar nombre de inst in cache
-                    lock (data)
+                    lock (c.dataCache)
                     {
                         // Area critica
                         if (dirBloqueCache > data.Length || dirBloqueCache < 0)
