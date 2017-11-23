@@ -102,7 +102,7 @@ namespace ProyectoArqui
                 int sr2 = itr.argument2;
                 int imm = itr.argument3;
 
-                if (OperatingSystem.slowModeActivated)
+                if (OperatingSystem.slowModeActivated || true) // TODO quitar esta mica
 
                     log("executing instruction " + itr.toString() + "\n" +
                     "Register values" + currentContext.registersToString()
@@ -138,6 +138,8 @@ namespace ProyectoArqui
 
                     case 35: //LW
 
+                        OperatingSystem.log("Proc " + parent.id + " dir \n" + parent.dir.toString());
+
                         int memoryAddress = imm + registers[src];
 
                         int? datoLoad = dataCache.fetchData(memoryAddress, this);
@@ -157,6 +159,8 @@ namespace ProyectoArqui
                         {
                             // ?????
                         }
+                        OperatingSystem.log("Proc " + parent.id + " dir \n" + parent.dir.toString());
+                        Console.ReadLine();
 
                         break;
                     case 43: //SW
@@ -164,12 +168,13 @@ namespace ProyectoArqui
                         int posicionMemoriaStore = imm + registers[(src)];
                         int datoEscribir = registers[(sr2)];
 
-                        bool datoStore = false;
+                        bool datoStore = dataCache.storeData(posicionMemoriaStore, datoEscribir, this);
                         //  datoStore = false;
                         //escribir en cache datos 
                         //(posicionMemoriaStore % 4, posicionMemoriaStore / 16, datoEscribir);
 
                         //if (datoStore == false) { cP--; }
+                        Console.ReadLine();
 
                         break;
                     case 50: //Load Linked

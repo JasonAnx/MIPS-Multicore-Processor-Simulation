@@ -48,7 +48,7 @@ namespace ProyectoArqui
                     Console.WriteLine("[Barrier Message]: Threads Syncronized");
                     Console.WriteLine("                   Press any key to continue");
                     Console.ResetColor();
-                    Console.ReadLine();
+                    //Console.ReadLine(); //TODO quitar esta vara
                 }
             });
             checkBarrierIntegrity();
@@ -137,6 +137,32 @@ namespace ProyectoArqui
                 //bloquear directorio de P1
                 return processors[1].dir;
             }
+        }
+
+        /*Recibe el ID del procesador y el ID la cache desde la cual se va a 
+         * tratar de invalidar al resto de caches y el bloque que se quiere invalidar*/
+        public static void invalidateBlockInCache(int myProc, int myCache, int dirBloqueCache, int dirBloque)
+        {
+            lock (getHomeDirectory(dirBloqueCache))
+            {
+                foreach (Processor p in processors)
+                {
+                    p.invalidate(myProc, myCache, dirBloqueCache, dirBloque);
+                }
+            }
+
+        }
+
+        public static bool isBlockOnAnotherCache(int myProc, int myCache, int dirBloqueCache, int dirBloque)
+        {
+            bool isblockOnAnotherCache = false;
+            int p = 0;
+            while (p < processors.Length && !isblockOnAnotherCache)
+            {
+                isblockOnAnotherCache = processors[p].isBlockOnAnotherCache(myProc, myCache, dirBloqueCache, dirBloque);
+                p++;
+            }
+            return isblockOnAnotherCache;
         }
 
     }
