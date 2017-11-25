@@ -110,22 +110,6 @@ namespace ProyectoArqui
             }
         }
 
-        public static bool tryBlockHomeDirectory(int dirBlock)
-        {
-            bool dirBlocked = false;
-            if (dirBlock < p0_sharedmem_size)
-            {
-                //bloquear directorio de P0
-                dirBlocked = true; /* si se logra*/
-            }
-            else
-            {
-                //bloquear directorio de P1
-                dirBlocked = true; /* si se logra*/
-            }
-            return dirBlocked;
-        }
-
         public static Processor.DirectoryProc getHomeDirectory(int dirBlock)
         {
             if (dirBlock < p0_sharedmem_size)
@@ -152,19 +136,6 @@ namespace ProyectoArqui
             }
 
         }
-
-        public static bool isBlockOnAnotherCache(int myProc, int myCache, int dirBloqueCache, int dirBloque)
-        {
-            bool isblockOnAnotherCache = false;
-            int p = 0;
-            while (p < processors.Length && !isblockOnAnotherCache)
-            {
-                isblockOnAnotherCache = processors[p].isBlockOnAnotherCache(myProc, myCache, dirBloqueCache, dirBloque);
-                p++;
-            }
-            return isblockOnAnotherCache;
-        }
-
     }
 
 }
