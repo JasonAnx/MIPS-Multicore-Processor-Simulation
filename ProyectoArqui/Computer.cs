@@ -45,12 +45,13 @@ namespace ProyectoArqui
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("[Barrier Message]: Threads Syncronized");
+                    Console.WriteLine("[Barrier Message]: clock tick " + clock);
 
                     if (OperatingSystem.slowModeActivated)
                     {
                         Console.WriteLine("                   Press any key to continue");
                         Console.ReadLine();
-                        Console.Clear();
+                        //Console.Clear();
 
                     }
                     Console.ResetColor();
@@ -96,6 +97,17 @@ namespace ProyectoArqui
             int totalCores = 0;
             foreach (Processor p in processors)
             {
+                totalCores += p.getCoreCount();
+            }
+            return totalCores;
+        }
+
+        public static int getCoreCountBefore(Processor pr)
+        {
+            int totalCores = 0;
+            foreach (Processor p in processors)
+            {
+                if (p == pr) break;
                 totalCores += p.getCoreCount();
             }
             return totalCores;

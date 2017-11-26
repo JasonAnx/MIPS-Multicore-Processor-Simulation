@@ -45,13 +45,20 @@ namespace ProyectoArqui
 
         public string toString()
         {
-            string s = "";
+            string s = "\nblock\tstatus\t ";
+            for (int j = 0; j < n_caches; j++)
+            {
+                s +=j+"\t";
+            }
+            s += "\n";
+
+
             for (int i = 0; i < block_states.Length; i++)
             {
-                s += i + ", " + block_states[i] + ", ";
+                s += i + "\t" + block_states[i] + "\t";
                 for (int j = 0; j < n_caches; j++)
                 {
-                    s += caches_matrix[j, i] + " ";
+                    s += caches_matrix[j, i]? caches_matrix[j, i] +"\t": " - \t";
                 }
                 s += "\n";
             }
@@ -87,36 +94,7 @@ namespace ProyectoArqui
             }
             return -1;
         }
-        // Set specific matrix position to true
-        public void setMatrixState(int procParentId, int numCache, int dirBloque, bool value)
-        {
-            procParentId = procParentId > 0 ? procParentId+=1 : procParentId += 0;
-            int col = procParentId + numCache;
-            int colLen = caches_matrix.GetLength(1);
-            int row = dirBloque % colLen;
-            caches_matrix[col, row] = value;
 
-        }
-
-        public bool isBlockOnAnotherCache(int myProc, int myCache, int dirBlock)
-        {
-            DirectoryProc home = Computer.getHomeDirectory(dirBlock);
-            bool isOnAnother = false;
-            if (myProc == 1)
-            {
-                myCache = 2;
-            }
-            int i = 0;
-            while (i < Computer.getGlobalCoreCount())
-            {
-                if (i != myCache && home.caches_matrix[i, dirBlock] == true)
-                {
-                    isOnAnother = true;
-                }
-                i++;
-            }
-            return isOnAnother;
-        }
         public void setState(int bloque, dirStates state)
         {
             Console.WriteLine(bloque + " " + state);
