@@ -48,7 +48,7 @@ namespace ProyectoArqui
                     Console.WriteLine("[Barrier Message]: Threads Syncronized");
                     Console.WriteLine("                   Press any key to continue");
                     Console.ResetColor();
-                    Console.ReadLine();
+                    //Console.ReadLine(); //TODO quitar esta vara
                 }
             });
             checkBarrierIntegrity();
@@ -110,22 +110,6 @@ namespace ProyectoArqui
             }
         }
 
-        public static bool tryBlockHomeDirectory(int dirBlock)
-        {
-            bool dirBlocked = false;
-            if (dirBlock < p0_sharedmem_size)
-            {
-                //bloquear directorio de P0
-                dirBlocked = true; /* si se logra*/
-            }
-            else
-            {
-                //bloquear directorio de P1
-                dirBlocked = true; /* si se logra*/
-            }
-            return dirBlocked;
-        }
-
         public static Processor.DirectoryProc getHomeDirectory(int dirBlock)
         {
             if (dirBlock < p0_sharedmem_size)
@@ -139,6 +123,19 @@ namespace ProyectoArqui
             }
         }
 
+        /*Recibe el ID del procesador y el ID la cache desde la cual se va a 
+         * tratar de invalidar al resto de caches y el bloque que se quiere invalidar*/
+        public static void invalidateBlockInCache(int myProc, int myCache, int dirBloqueCache, int dirBloque)
+        {
+            lock (getHomeDirectory(dirBloqueCache))
+            {
+                foreach (Processor p in processors)
+                {
+                    p.invalidate(myProc, myCache, dirBloqueCache, dirBloque);
+                }
+            }
+
+        }
     }
 
 }

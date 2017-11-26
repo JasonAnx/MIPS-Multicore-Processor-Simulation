@@ -7,5 +7,5 @@
 #### Linux
 
     sudo apt-get install mono-complete
-    mcs Computer.cs
+    mcs *.cs
     mono Computer.exe

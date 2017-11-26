@@ -36,9 +36,9 @@ namespace ProyectoArqui
         //    }
         //}
         public void setValue(Bloque<T> bl) {
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < Computer.block_size; i++)
             {
-                this.word[i] = bl.word[i];
+                word[i] = bl.word[i];
             }
         }
     }
