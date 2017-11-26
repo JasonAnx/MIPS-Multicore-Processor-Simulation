@@ -100,6 +100,7 @@ namespace ProyectoArqui
 
         public bool isBlockOnAnotherCache(int myProc, int myCache, int dirBlock)
         {
+            DirectoryProc home = Computer.getHomeDirectory(dirBlock);
             bool isOnAnother = false;
             if (myProc == 1)
             {
@@ -108,7 +109,7 @@ namespace ProyectoArqui
             int i = 0;
             while (i < Computer.getGlobalCoreCount())
             {
-                if (i != myCache && caches_matrix[i, dirBlock] == true)
+                if (i != myCache && home.caches_matrix[i, dirBlock] == true)
                 {
                     isOnAnother = true;
                 }

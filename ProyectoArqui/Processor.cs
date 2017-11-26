@@ -461,7 +461,7 @@ namespace ProyectoArqui
                     if (Computer.processors[1].cores[0].dataCache.labelsOfWords[dirBloqueCache] == dirCache &&
                         (procId != 1 || coreId != 0))
                     {
-                        return Computer.processors[0].cores[0].dataCache;
+                        return Computer.processors[1].cores[0].dataCache;
                     }
                     else
                     {
