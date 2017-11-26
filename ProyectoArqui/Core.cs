@@ -60,8 +60,7 @@ namespace ProyectoArqui
 
             public void log(string msg)
             {
-                Console.WriteLine("[Core " + (_coreId + 1) +
-                    " on Processor " + parent.id + "] > " + msg
+                Console.WriteLine("\n[ Processor " + parent.id + " : Core " + (_coreId) + " ] > " + msg
                     );
             }
 
@@ -105,7 +104,7 @@ namespace ProyectoArqui
                 if (OperatingSystem.slowModeActivated || true) // TODO quitar esta mica
 
                     log("executing instruction " + itr.toString() + "\n" +
-                    "Register values" + currentContext.registersToString()
+                    "\tRegister values" + currentContext.registersToString()
                     );
 
                 switch (opC)
@@ -138,7 +137,6 @@ namespace ProyectoArqui
 
                     case 35: //LW
 
-                        OperatingSystem.log("Proc " + parent.id + " dir \n" + parent.dir.toString());
 
                         int memoryAddress = imm + registers[src];
 
@@ -159,22 +157,18 @@ namespace ProyectoArqui
                         {
                             // ?????
                         }
-                        OperatingSystem.log("Proc " + parent.id + " dir \n" + parent.dir.toString());
-                        Console.ReadLine();
 
                         break;
                     case 43: //SW
 
-                        int posicionMemoriaStore = imm + registers[(src)];
-                        int datoEscribir = registers[(sr2)];
+                        int memoryAddressStore = imm + registers[(src)];
+                        int word = registers[(sr2)];
 
-                        bool datoStore = dataCache.storeData(posicionMemoriaStore, datoEscribir, this);
-                        //  datoStore = false;
+                        bool datoStore = dataCache.storeData(memoryAddressStore, word, this);
                         //escribir en cache datos 
-                        //(posicionMemoriaStore % 4, posicionMemoriaStore / 16, datoEscribir);
+                        //(memoryAddressStore % 4, memoryAddressStore / 16, word);
 
                         //if (datoStore == false) { cP--; }
-                        Console.ReadLine();
 
                         break;
                     case 50: //Load Linked

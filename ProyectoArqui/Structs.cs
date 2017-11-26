@@ -118,6 +118,8 @@ namespace ProyectoArqui
         public string registersToString()
         {
             string r = ctxId + ": " + "\n";
+            r += "\n\t";
+
             for (int i = 0; i < registerValues.Length; i++)
             {
                 if (registerValues[i] != 0)
@@ -126,7 +128,7 @@ namespace ProyectoArqui
                     r += "R" + i + ": " + registerValues[i] + " | ";
                 }
             }
-            r += "\n" + "\n" + "-------------------------------------" + "\n";
+            r += "\n";
             return r;
         }
     }
