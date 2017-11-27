@@ -37,7 +37,7 @@ namespace ProyectoArqui
             OperatingSystem.userQuantum = userInterface.getUserQuantum();
             OperatingSystem.log("Quantum set to " + OperatingSystem.userQuantum);
             OperatingSystem.slowModeActivated = userInterface.getSlowModeActivated();
-            
+
 
             // Sync Barrier
             bsync = new Barrier(getGlobalCoreCount(), (b) =>
@@ -45,18 +45,18 @@ namespace ProyectoArqui
                 clock++;
                 quantum--;
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("[Barrier Message]: Threads Syncronized");
-                    Console.WriteLine("[Barrier Message]: clock tick " + clock);
-
                     if (OperatingSystem.slowModeActivated)
                     {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("[Barrier Message]: Threads Syncronized");
+                        Console.WriteLine("[Barrier Message]: clock tick " + clock);
+
                         Console.WriteLine("                   Press any key to continue");
                         Console.ReadLine();
                         //Console.Clear();
 
+                        Console.ResetColor();
                     }
-                    Console.ResetColor();
                 }
             });
             checkBarrierIntegrity();
@@ -138,13 +138,11 @@ namespace ProyectoArqui
         {
             if (dirBlock < p0_sharedmem_size)
             {
-                Console.WriteLine("returned dir 0");
                 return processors[0].dir;
             }
             else
             {
                 //bloquear directorio de P1
-                Console.WriteLine("returned dir 1");
                 return processors[1].dir;
             }
         }

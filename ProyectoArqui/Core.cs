@@ -100,11 +100,6 @@ namespace ProyectoArqui
                 int sr2 = itr.argument2;
                 int imm = itr.argument3;
 
-                if (OperatingSystem.slowModeActivated || true) // TODO quitar esta mica
-
-                    log("executing instruction " + itr.toString() + "\n" + currentContext.registersToString()
-                    );
-
                 switch (opC)
                 {
 
@@ -115,21 +110,26 @@ namespace ProyectoArqui
                     /***** OPERACIONES ARITMETICAS BASICAS *****/
                     case 8:
                         registers[sr2] = registers[src] + imm;
+                        addTicks();
                         break;
                     case 32:
                         registers[imm] = registers[src] + registers[sr2];
+                        addTicks();
                         break;
 
                     case 34:
                         registers[imm] = registers[src] - registers[sr2];
+                        addTicks();
                         break;
 
                     case 12:
                         registers[imm] = registers[src] * registers[sr2];
+                        addTicks();
                         break;
 
                     case 14:
                         registers[imm] = registers[src] / registers[sr2];
+                        addTicks();
                         break;
                     /**** LOADS Y STORES ******/
 
@@ -154,6 +154,7 @@ namespace ProyectoArqui
                         if (datoLoad != null)
                         {
                             registers[sr2] = ((int)datoLoad);
+                            //parent.printSharedMem();
                         }
                         else
                         {
@@ -178,6 +179,14 @@ namespace ProyectoArqui
                             //OperatingSystem.slowModeActivated = true;
                             //Console.ReadLine();
                             currentContext.instruction_pointer -= 4;
+                        }
+                        else
+                        {
+                            //int dirBloque = memoryAddressStore / (Computer.block_size * 4);
+                            //int dirPalabra = memoryAddressStore % (Computer.block_size * 4) / this.dataCache.data.Length;
+                            //parent.printSharedMem();
+                            //Console.WriteLine("\nmem dir bloq " + dirBloque
+                            //    + " pal " + dirPalabra + " = " + word + "\n Datacache = " + this.myDataCacheToString(this));
                         }
 
 
@@ -241,6 +250,10 @@ namespace ProyectoArqui
                         break;
                 }
 
+                if (OperatingSystem.slowModeActivated)
+
+                    log("Results ofexecuting instruction " + itr.toString() + "\n" + currentContext.registersToString()
+                    );
                 // Incrementar PC
                 //cP++;
 
