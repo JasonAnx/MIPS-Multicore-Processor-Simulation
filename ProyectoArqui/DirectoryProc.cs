@@ -97,7 +97,7 @@ namespace ProyectoArqui
 
         public void setState(int bloque, dirStates state)
         {
-            Console.WriteLine(bloque + " " + state);
+            //Console.WriteLine(bloque + " " + state);
             block_states[bloque % block_states.Length] = state;
         }
 
