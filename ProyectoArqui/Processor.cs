@@ -21,7 +21,9 @@ namespace ProyectoArqui
 
         private Core[] cores;
 
+        //Cola de contexto que se utiliza durante la simulacion
         public Queue<Context> contextQueue = new Queue<Context>();
+        //Cola de contexto para guardar los hilillos finalizados
         public Queue<Context> finishedTds = new Queue<Context>();
 
         public const int numCaches = 3;
@@ -53,6 +55,7 @@ namespace ProyectoArqui
             finishedTds.Enqueue(ctx);
         }
 
+        //Imprime los contextos archivados (se archivan para que no se pierdan una vez que se acaban)
         public void printArchivedContexts()
         {
             string s = "";
@@ -65,6 +68,7 @@ namespace ProyectoArqui
             Console.WriteLine(s);
         }
 
+        //Imprime las caches de datos
         public void printDataCaches()
         {
             string s = "";
@@ -75,6 +79,7 @@ namespace ProyectoArqui
             Console.WriteLine(s);
         }
 
+        //Imprime la memoria compartida
         public void printSharedMem()
         {
             string s = "Shared Memory\nProcessor 0:\n";
@@ -106,11 +111,13 @@ namespace ProyectoArqui
             //Console.WriteLine("procesador " + id + "tiene " + cores.Length + "cores");
             foreach (Core c in cores)
             {
+                //Crea un hilo de ejecucion para cada nucleo
                 Thread t = new Thread(new ThreadStart(c.start));
                 t.Start();
             }
         }
 
+        //Metodo que invalida el resto de caches que tengan "mi bloque"
         public void invalidate(int procId, int coreId, int dirBloqueCache, int dirBloque)
         {
             foreach (Core c in cores)
@@ -124,10 +131,13 @@ namespace ProyectoArqui
                         //Invalida el bloque en la cache
                         c.GetDataCache().statesOfWords[dirBloqueCache] = c.GetDataCache().Invalid();
 
-
+                        //Obtiene directorio casa del bloque
                         DirectoryProc homedir = Computer.getHomeDirectory(dirBloque);
                         lock (homedir)
                         {
+                            //Suma 1 o 5 por el acceso a directorio
+                            c.addTicksForAccessDir(homedir.getParent().id);
+                            //lo remueve del directorio
                             c.GetDataCache().setMatrixState(c, dirBloque, false);
                             if (!c.isBlockOnAnotherCache(dirBloque))
                             {
@@ -159,6 +169,7 @@ namespace ProyectoArqui
                 }
                 parent = prnt;
                 shMem = new Bloque<int>[sizeMem];
+                //Inicializa la memoria compartida con el valor especificado al principio 
                 for (int i = 0; i < sizeMem; i++)
                 {
                     shMem[i] = new Bloque<int>(Computer.block_size);
@@ -169,6 +180,7 @@ namespace ProyectoArqui
                 }
             }
 
+            //Devuelve el bloque en la posicion numBloque
             public Bloque<int> getBloque(int numBloque)
             {
 
@@ -183,24 +195,29 @@ namespace ProyectoArqui
                 }
             }
 
+            //Retorna el arreglo de datos de la memoria compartida local
             public Bloque<int>[] getShMem()
             {
                 return shMem;
             }
 
+            ////Retorna el tamano de la memoria compartida local
             public int getShMemLenght()
             {
                 return shMem.Length;
             }
 
+            //Inserta el bloque "block" en la posicion numBloque 
             public bool insertBloque(int numBloque, Bloque<int> block)
             {
                 bool inserted = false;
+                //ShMem de proc 0
                 if (numBloque < Computer.p0_sharedmem_size)
                 {
                     Computer.processors[0].shrmem.getShMem()[numBloque].setValue(block);
                     inserted = true;
                 }
+                //ShMem de proc 1
                 else
                 {
                     Computer.processors[1].shrmem.getShMem()[numBloque - Computer.p0_sharedmem_size].setValue(block);
@@ -285,11 +302,13 @@ namespace ProyectoArqui
                 dataCache = new DataCache();
             }
 
+            //Suma un ciclo de reloj. Cuando son operaciones aritméticas o hits
             public void addTicks()
             {
                 this.ticks += 1;
             }
 
+            //Suma 1 o 5 ciclos de reloj. Cuando se accede a dir local o remoto.
             public void addTicksForAccessDir(int dirParentId)
             {
                 //si estoy acceso directorio propio
@@ -302,8 +321,7 @@ namespace ProyectoArqui
                 }
             }
 
-            //Recibe el numero de bloque que va a ser escrito o leido desde memoria local o remota
-            //Necesita el id del procesador para saber si el acceso va a ser local o remoto
+            //Suma 16 o 40 ciclos de reloj. Cuando se accede a Shared Mem local o remota  
             public void addTicksForAccessShMem(int numWriteBlock)
             {
                 //si es memoria local
@@ -351,7 +369,7 @@ namespace ProyectoArqui
 
             // Saves current Context in contextQueue
             // Loads new Context
-
+            //Verifica que un bloque no este en otra cache. Esto para poder marca en el directorio estado U
             public bool isBlockOnAnotherCache(int dirBlock)
             {
                 DirectoryProc home = Computer.getHomeDirectory(dirBlock);
@@ -396,6 +414,7 @@ namespace ProyectoArqui
                 return this.dataCache;
             }
 
+            //Imprime la cache de datos
             public string myDataCacheToString(Core c)
             {
                 string dataCache = "Data cache from processor " + c.getParentId() + ", core " + c.getId() + ":\n";
@@ -446,22 +465,25 @@ namespace ProyectoArqui
                     }
                 } // EO constr
 
+                //Almacena las instrucciones en la cache de instrucciones
                 public Instruction fetchInstruction(int program_counter, Core c)
                 {
                     int dirBloque = program_counter / (Computer.block_size * 4);
                     int dirBloqueCache = dirBloque % 4;
                     int dirPalabra = program_counter % (Computer.block_size * 4) / blocks.Length;
-
+                    //No deberia entrar aqui
                     if (dirBloqueCache > labelsOfInstrs.Length || dirBloqueCache < 0)
                     {
                         c.log("Error: wrong block direction : " + dirBloqueCache);
                         Environment.Exit(33);
                     }
-
+                    //hit
                     if (labelsOfInstrs[dirBloqueCache] == dirBloque)
                     {
+                        //una palabra (instruccion)
                         return blocks[dirBloqueCache].word[dirPalabra];
                     }
+                    //miss 
                     else
                     {
                         miss(program_counter, c);
@@ -470,10 +492,12 @@ namespace ProyectoArqui
                 }
                 public void miss(int program_counter, Core c)
                 {
+                    //Trae la el bloque de la memoria de instrucciones
                     int dirBloque = program_counter / (Computer.block_size * 4);
                     Bloque<Instruction> blk = c.parent.isntrmem.getBloque(dirBloque);
-
+                    
                     int dirBloqueCache = dirBloque % 4;
+                    //Asigna el bloque en la cache
                     blocks[dirBloqueCache] = blk;
                     labelsOfInstrs[dirBloqueCache] = dirBloque;
 
@@ -482,12 +506,11 @@ namespace ProyectoArqui
                 }
             }
 
-
-
-
-
             public class DataCache
             {
+                /// <summary>
+                /// La DataCache esta compuesta por sus datos, las etiquetas de bloque y los estados de bloques 
+                /// </summary>
                 public enum states { shared, invalid, modified }
                 public Bloque<int>[] data;
                 public int[] labelsOfWords;
@@ -546,6 +569,7 @@ namespace ProyectoArqui
                     }
                 }
 
+                //Devuelve el core que tenga el bloque con la direccion dirBloque
                 public Core GetCoreWithBlock(int dirBloque, int dirBloqueCache, DirectoryProc _home_dir_)
                 {
                     int f = _home_dir_.getCacheMatrix().GetLength(1);
@@ -570,9 +594,11 @@ namespace ProyectoArqui
                 {
                     return states.invalid;
                 }
-
+                
+                //LW
                 public int? fetchData(int program_counter, Core c)
                 {
+                    //Convierte el program_counter a direccion de caches de dato
                     int dirBloque = program_counter / (Computer.block_size * 4);
                     int dirBloqueCache = dirBloque % 4;
                     int dirPalabra = program_counter % (Computer.block_size * 4) / data.Length;
@@ -588,7 +614,7 @@ namespace ProyectoArqui
                     {
                         try
                         {
-                            // si est'a en esta cache ( no es invalido ), retornarlo
+                            // si esta en esta cache ( no es invalido ), retornarlo
                             if (labelsOfWords[dirBloqueCache] == dirBloque &&
                                 statesOfWords[dirBloqueCache] != states.invalid) // hit
                             {
@@ -617,6 +643,7 @@ namespace ProyectoArqui
 
                 public bool miss(int program_counter, Core thisCore)
                 {
+
                     int dirBloque = program_counter / (Computer.block_size * 4);
                     int dirBloqueCache = dirBloque % 4;
 
@@ -625,14 +652,12 @@ namespace ProyectoArqui
                     {
                         DirectoryProc inCacheBlockDir = Computer.getHomeDirectory(labelsOfWords[dirBloqueCache]);
 
-                        //+40 or +16 (esta suma es cuando se inserta en memoria)
                         lock (thisCore.parent.shrmem)
                         {
                             thisCore.addTicksForAccessShMem(dirBloque);
                             thisCore.parent.shrmem.insertBloque(labelsOfWords[dirBloqueCache], data[dirBloqueCache]);
                         }
                         // Block the home directory of the victim block
-                        // 5 o 1
                         lock (inCacheBlockDir)
                         {
                             thisCore.addTicksForAccessDir(inCacheBlockDir.getParent().id);
@@ -723,8 +748,6 @@ namespace ProyectoArqui
                         }
 
                         /*guarda en mi cache el bloque desde memoria compartida*/
-
-                        // 
                         lock (thisCore.parent.shrmem)
                         {
                             thisCore.addTicksForAccessShMem(dirBloque);
@@ -743,13 +766,16 @@ namespace ProyectoArqui
                     }
                 }
 
+                //SW recibe el program counter y el dato que se desea almacenar
                 public bool storeData(int program_counter, int dato, Core thisCore)
                 {
+                    //Convierte el program_counter a direccion de caches de dato
                     int dirBloque = program_counter / (Computer.block_size * 4);
                     int dirBloqueCache = dirBloque % 4;
                     int dirPalabra = program_counter % (Computer.block_size * 4) / data.Length;
                     bool stored = false;
-
+                    
+                    //No deberia entrar aqui
                     if (dirBloqueCache > data.Length || dirBloqueCache < 0)
                     {
                         thisCore.log("Error: wrong block direction : " + dirBloqueCache);
@@ -782,7 +808,7 @@ namespace ProyectoArqui
 
                                 data[dirBloqueCache].word[dirPalabra] = dato;
                                 statesOfWords[dirBloqueCache] = states.modified;
-
+                                //Una vez que invalidad marca como modificado en el directorio propio
                                 DirectoryProc _home_dir_ = Computer.getHomeDirectory(dirBloque);
                                 lock (_home_dir_)
                                 {
@@ -795,7 +821,7 @@ namespace ProyectoArqui
                                 stored = true;
                                 return stored;
                             }
-                            else // invalid
+                            else // Si el bloque esta invalido
                             {
                                 //Console.WriteLine("this is miss on store block  + dirBloque");
                                 if (missStore(program_counter, dato, thisCore))
@@ -815,6 +841,7 @@ namespace ProyectoArqui
 
                             if (missStore(program_counter, dato, thisCore))
                             {
+                                //Una vez que resulve el fallo y trae el bloque de mem lo marca como modificado
                                 statesOfWords[dirBloqueCache] = states.modified;
                                 stored = true;
                                 return stored;
@@ -828,6 +855,7 @@ namespace ProyectoArqui
 
                 public bool missStore(int program_counter, int dato, Core thisCore)
                 {
+                    //Convierte el program_counter a direccion de caches de dato
                     int dirBloque = program_counter / (Computer.block_size * 4);
                     int dirBloqueCache = dirBloque % 4;
                     int dirPalabra = program_counter % (Computer.block_size * 4) / data.Length;
@@ -849,7 +877,6 @@ namespace ProyectoArqui
                             thisCore.addTicksForAccessDir(inCacheBlockDir.getParent().id);
 
                             // Se suman 5 o 1 en caso de que sea remote o local, respectivamente
-                            //+40 or +16
                             lock (thisCore.parent.shrmem)
                             {
                                 thisCore.addTicksForAccessShMem(dirBloque);
@@ -891,7 +918,7 @@ namespace ProyectoArqui
                         }
                     }
 
-
+                    //Directorio que tenga el bloque
                     DirectoryProc toFetchBlockDir = Computer.getHomeDirectory(dirBloque);
 
                     if (OperatingSystem.slowModeActivated)
@@ -983,14 +1010,14 @@ namespace ProyectoArqui
                         lock (thisCore.parent.shrmem)
                         {
                             thisCore.addTicksForAccessShMem(dirBloque);
-
+                            //Marca el bloque como modificado en la cache
                             data[dirBloqueCache] = thisCore.parent.shrmem.getBloque(dirBloque);
                             data[dirBloqueCache].word[dirPalabra] = dato;
                             labelsOfWords[dirBloqueCache] = dirBloque;
                             statesOfWords[dirBloqueCache] = states.modified;
                         }
 
-
+                        //Marca el bloque como modificado en en el dir
                         setMatrixState(thisCore, dirBloque, true);
                         toFetchBlockDir.setState(dirBloque, DirectoryProc.dirStates.M);
                         if (OperatingSystem.slowModeActivated)

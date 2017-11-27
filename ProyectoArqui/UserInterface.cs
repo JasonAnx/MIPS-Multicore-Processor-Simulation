@@ -37,6 +37,7 @@ namespace ProyectoArqui
             return userSlowMode;
         }
 
+        // Ask if user wants setup the ShMem with 0s or 1s
         public bool getValueForShMem() {
             string valueShMem = "";
             bool valueforShMem = false; // Default value: 0

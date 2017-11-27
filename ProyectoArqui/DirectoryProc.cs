@@ -24,18 +24,21 @@ namespace ProyectoArqui
             caches_matrix = new Boolean[n_caches, n_blocks];
         }
 
-
+        //Retorna el arreglo de estados del directorio
         public dirStates[] getStates()
         {
             return block_states;
         }
 
+        //Retorna el estado de un bloque especifico en el directorio
         public dirStates getStateOfBlock(int dirBlock)
         {
+            //Directorio de proc 0
             if (dirBlock < Computer.p0_sharedmem_size)
             {
                 return block_states[dirBlock];
             }
+            //Directorio de proc 1
             else
             {
                 return block_states[dirBlock - Computer.p0_sharedmem_size];
@@ -43,6 +46,7 @@ namespace ProyectoArqui
 
         }
 
+        //Imprime el directorio
         public string toString()
         {
             string s = "\nblock\tstatus\t ";
@@ -65,12 +69,13 @@ namespace ProyectoArqui
             return s;
         }
 
+        //Retorna los estados de los bloques en el directorio
         public Boolean[,] getCacheMatrix()
         {
             return caches_matrix;
         }
 
-        // Set state to U
+        //Marca un bloque en especifico con estado U
         public void setUState(int dirBloque)
         {
             block_states[dirBloque] = dirStates.U;
@@ -81,6 +86,7 @@ namespace ProyectoArqui
             return parent;
         }
 
+        //Retorna el indice de la cache que tiene al bloque
         public int getIdOfCacheWithBlock(int dirBloque)
         {
             int i = 0;
@@ -95,6 +101,7 @@ namespace ProyectoArqui
             return -1;
         }
 
+        //Marca un bloque con el estado que recibe como parametro
         public void setState(int bloque, dirStates state)
         {
             //Console.WriteLine(bloque + " " + state);

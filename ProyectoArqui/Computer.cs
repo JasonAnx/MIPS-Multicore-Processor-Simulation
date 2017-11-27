@@ -70,6 +70,7 @@ namespace ProyectoArqui
 
         }
 
+        //Imprime los registro y las caches al final de la simulacion
         static void OnProcessExit(object sender, EventArgs e)
         {
             OperatingSystem.log(" --- Results ---");
@@ -98,7 +99,7 @@ namespace ProyectoArqui
             }
         }
 
-
+        //Conteo de los nucleos por proc
         public static int getGlobalCoreCount()
         {
             int totalCores = 0;
@@ -120,11 +121,13 @@ namespace ProyectoArqui
             return totalCores;
         }
 
+        //Carga las instrucciones a mem de instrucciones
         public static void loadData()
         {
             OperatingSystem.allocateInstInMem();
         }
 
+        //Crear los hilos para cada core de cada proc
         public static void execute()
         {
             // inicia los hilos
@@ -134,6 +137,7 @@ namespace ProyectoArqui
             }
         }
 
+        //Devuelve el directorio cada de un bloque
         public static DirectoryProc getHomeDirectory(int dirBlock)
         {
             if (dirBlock < p0_sharedmem_size)
@@ -158,10 +162,6 @@ namespace ProyectoArqui
             }
 
 
-        }
-
-        public static int getClock() {
-            return clock;
         }
     }
 

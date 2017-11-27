@@ -10,6 +10,8 @@ namespace ProyectoArqui
         public static bool slowModeActivated;
         public static bool valueShMem;
 
+
+        //Lee los folders con los hillios 
         public static void allocateInstInMem()
         {
             string programPath = chooseProgramFolder();
@@ -97,6 +99,8 @@ namespace ProyectoArqui
             }
             else return null;
         }
+        
+        //Metodos de impresion de mensajes
 
         public static void log(string s)
         {

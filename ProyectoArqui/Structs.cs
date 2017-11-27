@@ -104,7 +104,8 @@ namespace ProyectoArqui
         bool threadIsFinalized;
         public bool isFinalized { get { return threadIsFinalized; } set { threadIsFinalized = value; } }
 
-        //
+        //Contexto que guarda los valores de un hilillo.
+        //Se utiliza cuando se va a guardar un nuevo contexto en la cola
         public Context(int instr_ptr, string threadId, float threadExecutionTime, int[] registerValues, bool threadIsFinalized, int clockTicks)
         {
             this.ctxId = threadId;
@@ -115,6 +116,7 @@ namespace ProyectoArqui
             this.clockTicks = clockTicks;
         }
 
+        //Crea un contexto
         public Context(int instr_ptr, string threadId)
         {
             instruction_pointer = instr_ptr;
@@ -125,6 +127,7 @@ namespace ProyectoArqui
             clockTicks = 0;
         }
 
+        //Retorna los registros de un contexto
         public int[] getRegisterValues() { return registerValues; }
 
         // Print core register values (32 int array) from Core 
@@ -146,6 +149,7 @@ namespace ProyectoArqui
             return r;
         }
 
+        //Imprime el ciclo en el que termina un hilillo
         public string clockTicksToString()
         {
             string s = "Clock ticks of " + ctxId + ": ";
@@ -154,6 +158,7 @@ namespace ProyectoArqui
             return s;
         }
 
+        //Incrementa los ciclos de un hilillo
         public void addClockTicks(int ticks) {
             clockTicks += ticks;
         }
