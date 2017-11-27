@@ -13,7 +13,7 @@ namespace ProyectoArqui
             InstructionCache instructionsCache;
             DataCache dataCache;
             private int _coreId;
-
+            int ticks;
             Context currentContext;
 
             public int getId() { return _coreId; }

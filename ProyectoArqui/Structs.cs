@@ -104,12 +104,12 @@ namespace ProyectoArqui
 
         //Contexto que guarda los valores de un hilillo.
         //Se utiliza cuando se va a guardar un nuevo contexto en la cola
-        public Context(int instr_ptr, string threadId, float threadExecutionTime, int[] registerValues, bool threadIsFinalized, int clockTicks)
+        public Context(int instr_ptr, string threadId, int[] registerValues, bool threadIsFinalized, int clockTicks)
         {
+            this.instruction_pointer = instr_ptr;
             this.ctxId = threadId;
             this.registerValues = registerValues;
             this.threadIsFinalized = threadIsFinalized;
-            this.instruction_pointer = instr_ptr;
             this.clockTicks = clockTicks;
         }
 

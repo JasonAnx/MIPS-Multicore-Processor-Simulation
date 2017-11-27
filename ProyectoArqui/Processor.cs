@@ -301,6 +301,13 @@ namespace ProyectoArqui
                 dataCache = new DataCache();
             }
 
+            //Suma un ciclo de reloj. Cuando son operaciones aritméticas o hits
+            public void addTicks()
+            {
+                this.ticks += 1;
+            }
+
+            //Suma 1 o 5 ciclos de reloj. Cuando se accede a dir local o remoto.
             public void addTicksForAccessDir(int dirParentId)
             {
                 //si estoy acceso directorio propio
