@@ -41,12 +41,6 @@ namespace ProyectoArqui
                         currentContext.instruction_pointer += 4;
                         execute_instruction(nxtIst);
 
-                        // Print register values after each cycle
-
-                        //Console.WriteLine(parent.contextQueue.Count);
-                        // Print register values after each cycle
-
-
                         Computer.bsync.SignalAndWait();
                     }
                     if (!currentContext.isFinalized)
@@ -103,8 +97,7 @@ namespace ProyectoArqui
 
                 if (OperatingSystem.slowModeActivated || true) // TODO quitar esta mica
 
-                    log("executing instruction " + itr.toString() + "\n" +
-                    "\tRegister values" + currentContext.registersToString()
+                    log("executing instruction " + itr.toString() + "\n" + currentContext.registersToString()
                     );
 
                 switch (opC)
@@ -154,7 +147,8 @@ namespace ProyectoArqui
                         else
                         {
                             log("Failed to execute load, will be re-attempted");
-                            Console.ReadLine();
+                            //OperatingSystem.slowModeActivated = true;
+                            //Console.ReadLine();
                             currentContext.instruction_pointer -= 4;
                         }
 
@@ -170,7 +164,8 @@ namespace ProyectoArqui
                         if (!datoStore)
                         {
                             log("Failed to execute Store, will be re-attempted");
-                            Console.ReadLine();
+                            //OperatingSystem.slowModeActivated = true;
+                            //Console.ReadLine();
                             currentContext.instruction_pointer -= 4;
                         }
 

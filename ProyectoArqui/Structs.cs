@@ -117,7 +117,7 @@ namespace ProyectoArqui
 
         public string registersToString()
         {
-            string r = ctxId + ": " + "\n";
+            string r = "\n  "+ ctxId + ": Register Values" + "\n";
             r += "\n\t";
 
             for (int i = 0; i < registerValues.Length; i++)
