@@ -8,6 +8,7 @@ namespace ProyectoArqui
     {
         public static int userQuantum;
         public static bool slowModeActivated;
+        public static bool valueShMem;
 
         public static void allocateInstInMem()
         {
@@ -51,7 +52,12 @@ namespace ProyectoArqui
 
 
                         }
-                        Computer.processors[numProcessor].createContext(instr_ptr * 4, filePath);
+                        /* Path converts   
+                         *              ./programs\litle test - lw+sw/p0\1.txt
+                         *  to
+                         *              1.txt
+                         */
+                        Computer.processors[numProcessor].createContext(instr_ptr * 4, Path.GetFileName(filePath));
                         instr_ptr += lines.Length;
                         //Console.WriteLine(memoria.getBloque(5).word0.operation);
                     }
@@ -110,7 +116,7 @@ namespace ProyectoArqui
             Console.WriteLine("[OS Message]: " + s);
             if (halt)
             {
-                Console.WriteLine("\tProgram Halted. Press any key to exit");
+                Console.WriteLine("\tProgram Halted. Press any key to continue");
             }
             else Console.ResetColor();
         }

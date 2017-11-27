@@ -42,12 +42,6 @@ namespace ProyectoArqui
                         currentContext.instruction_pointer += 4;
                         execute_instruction(nxtIst);
 
-                        // Print register values after each cycle
-
-                        //Console.WriteLine(parent.contextQueue.Count);
-                        // Print register values after each cycle
-
-
                         Computer.bsync.SignalAndWait();
                     }
                     if (!currentContext.isFinalized)
@@ -108,8 +102,7 @@ namespace ProyectoArqui
 
                 if (OperatingSystem.slowModeActivated || true) // TODO quitar esta mica
 
-                    log("executing instruction " + itr.toString() + "\n" +
-                    "\tRegister values" + currentContext.registersToString()
+                    log("executing instruction " + itr.toString() + "\n" + currentContext.registersToString()
                     );
 
                 switch (opC)
@@ -152,15 +145,16 @@ namespace ProyectoArqui
                         creo que hay que ver en el dir?? o si cae en mem compartida ??
                         */
 
-                        //hay que hacer el caso if (dato == null) para que se proceda a intentar de nuevo
-                        //con el fallo de caché ya resuelto                                        
                         if (datoLoad != null)
                         {
                             registers[sr2] = ((int)datoLoad);
                         }
                         else
                         {
-                            // ?????
+                            log("Failed to execute load, will be re-attempted");
+                            //OperatingSystem.slowModeActivated = true;
+                            //Console.ReadLine();
+                            currentContext.instruction_pointer -= 4;
                         }
 
                         break;
@@ -171,9 +165,15 @@ namespace ProyectoArqui
 
                         bool datoStore = dataCache.storeData(memoryAddressStore, word, this);
                         //escribir en cache datos 
-                        //(memoryAddressStore % 4, memoryAddressStore / 16, word);
 
-                        //if (datoStore == false) { cP--; }
+                        if (!datoStore)
+                        {
+                            log("Failed to execute Store, will be re-attempted");
+                            //OperatingSystem.slowModeActivated = true;
+                            //Console.ReadLine();
+                            currentContext.instruction_pointer -= 4;
+                        }
+
 
                         break;
                     case 50: //Load Linked
