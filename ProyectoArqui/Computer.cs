@@ -81,6 +81,7 @@ namespace ProyectoArqui
             foreach (Processor p in processors)
             {
                 p.printDataCaches();
+                OperatingSystem.log("Directory of proc " + p.id + " \n" + p.dir.toString());
             }
             processors[0].printSharedMem();
             Console.ResetColor();
@@ -163,6 +164,14 @@ namespace ProyectoArqui
 
 
         }
+<<<<<<< HEAD
+=======
+
+        public static int getClock()
+        {
+            return clock;
+        }
+>>>>>>> c6328ca70db76530e90764ea6d7b641fafc3d1c9
     }
 
 }

@@ -33,7 +33,6 @@ namespace ProyectoArqui
                     int cycles = -1;
                     while (cycles++ < OperatingSystem.userQuantum && !currentContext.isFinalized)
                     {
-                        ticks = 0;
                         Instruction nxtIst =
                             instructionsCache.fetchInstruction(
                                 currentContext.instruction_pointer,
@@ -46,7 +45,6 @@ namespace ProyectoArqui
                     }
                     if (!currentContext.isFinalized)
                     {
-                        currentContext.addClockTicks(this.ticks);
                         saveCurrentContext();
                     }
                 }
@@ -77,12 +75,9 @@ namespace ProyectoArqui
                     int[] registerValues = new int[32];
                     Array.Copy(registers, 0, registerValues, 0, 32);//Guarda los registros
                                                                     // Todavia esto no se mide, TODO
-                    float currentThreadExecutionTime = 0;
-
                     Context currentContext = new Context(
                         this.currentContext.instruction_pointer,
                         this.currentContext.id,
-                        currentThreadExecutionTime,
                         registerValues,
                         this.currentContext.isFinalized,
                         this.currentContext.clockTicks
@@ -110,41 +105,41 @@ namespace ProyectoArqui
                     /***** OPERACIONES ARITMETICAS BASICAS *****/
                     case 8:
                         registers[sr2] = registers[src] + imm;
-                        addTicks();
+                        currentContext.addClockTicks(1);
                         break;
                     case 32:
                         registers[imm] = registers[src] + registers[sr2];
-                        addTicks();
+                        currentContext.addClockTicks(1);
                         break;
 
                     case 34:
                         registers[imm] = registers[src] - registers[sr2];
-                        addTicks();
+                        currentContext.addClockTicks(1);
                         break;
 
                     case 12:
                         registers[imm] = registers[src] * registers[sr2];
-                        addTicks();
+                        currentContext.addClockTicks(1);
                         break;
 
                     case 14:
                         registers[imm] = registers[src] / registers[sr2];
-                        addTicks();
+                        currentContext.addClockTicks(1);
                         break;
                     /**** LOADS Y STORES ******/
 
                     case 35: //LW
 
-                        Computer.processors[0].printDataCaches();
-                        Computer.processors[1].printDataCaches();
-                        Computer.processors[0].printSharedMem();
+                        //Computer.processors[0].printDataCaches();
+                        //Computer.processors[1].printDataCaches();
+                        //Computer.processors[0].printSharedMem();
                         int memoryAddress = imm + registers[src];
 
                         int? datoLoad = dataCache.fetchData(memoryAddress, this);
 
-                        Computer.processors[0].printDataCaches();
-                        Computer.processors[1].printDataCaches();
-                        Computer.processors[0].printSharedMem();
+                        //Computer.processors[0].printDataCaches();
+                        //Computer.processors[1].printDataCaches();
+                        //Computer.processors[0].printSharedMem();
                         /*   -->  
                          *   datoLoad =
                             traer de cacheDatos (  memoryAddress % 4, memoryAddress / 16 );
