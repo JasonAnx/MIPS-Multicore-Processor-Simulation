@@ -78,7 +78,8 @@ namespace ProyectoArqui
         public void printSharedMem()
         {
             string s = "Shared Memory\nProcessor 0:\n";
-            for (int i = 0; i < Computer.p0_sharedmem_size+Computer.p1_sharedmem_size; i++) {
+            for (int i = 0; i < Computer.p0_sharedmem_size + Computer.p1_sharedmem_size; i++)
+            {
                 if (i == 16)
                 { s += "\nProcessor 1:\n"; }
                 if (i != 0 && i != 16 && i % 4 == 0)
@@ -152,7 +153,8 @@ namespace ProyectoArqui
             public SharedMemory(int sizeMem, Processor prnt)
             {
                 int valueSh = 0;
-                if (OperatingSystem.valueShMem) {
+                if (OperatingSystem.valueShMem)
+                {
                     valueSh = 1;
                 }
                 parent = prnt;
@@ -289,7 +291,8 @@ namespace ProyectoArqui
                 if (dirParentId == getParentId())
                     this.ticks += 1;
                 //si acceso a un dir remoto
-                else {
+                else
+                {
                     this.ticks += 5;
                 }
             }
@@ -354,21 +357,21 @@ namespace ProyectoArqui
                     int i = 0;
                     int thisCore = Computer.getCoreCountBefore(parent) + getId();
                     int f = home.getCacheMatrix().GetLength(1);
-                    log("i am core " + thisCore + " and f = " + f);
+                    //log("i am core " + thisCore + " and f = " + f);
                     while (i < Computer.getGlobalCoreCount())
                     {
 
                         //Console.ReadLine();
-                        log("dir " + home.getParent().id + "[" + i + ", " + dirBlock % f + "] == " + home.getCacheMatrix()[i, dirBlock % f]);
+                        //log("dir " + home.getParent().id + "[" + i + ", " + dirBlock % f + "] == " + home.getCacheMatrix()[i, dirBlock % f]);
                         if (home.getCacheMatrix()[i, dirBlock % f] == true && i != thisCore)
                         {
-                            log("cache holding the needed block found on core " + i);
+                            //log("cache holding the needed block found on core " + i);
                             return true;
                         }
                         i++;
                     }
                 }
-                log("No cache holding the needed block was found");
+                //log("No cache holding the needed block was found");
                 return false;
             }
 
@@ -391,24 +394,25 @@ namespace ProyectoArqui
 
             public string myDataCacheToString(Core c)
             {
-                string dataCache = "Data cache from processor "+c.getParentId()+ ", core "+ c.getId()+":\n";
-                for (int i = 0; i < 3; i++) {
+                string dataCache = "Data cache from processor " + c.getParentId() + ", core " + c.getId() + ":\n";
+                for (int i = 0; i < 3; i++)
+                {
                     if (i == 0)
-                        { dataCache += "Labels: "; }
+                    { dataCache += "Labels: "; }
                     if (i == 1)
-                        { dataCache += "Data  : "; }
+                    { dataCache += "Data  : "; }
                     if (i == 2)
-                        { dataCache += "States: "; }
+                    { dataCache += "States: "; }
                     for (int j = 0; j < cacheSize; j++)
                     {
                         if (i == 0)
-                            { dataCache += c.GetDataCache().labelsOfWords[j] + " "; }
+                        { dataCache += c.GetDataCache().labelsOfWords[j] + " "; }
 
                         if (i == 1)
-                            { dataCache += "Block " + j + ": " + c.GetDataCache().data[j].toString() + " "; }
+                        { dataCache += "Block " + j + ": " + c.GetDataCache().data[j].toString() + " "; }
 
                         if (i == 2)
-                            { dataCache += c.GetDataCache().statesOfWords[j] + " "; }
+                        { dataCache += c.GetDataCache().statesOfWords[j] + " "; }
                     }
                     dataCache += "\n";
                 }
@@ -525,13 +529,14 @@ namespace ProyectoArqui
                         int thisCore = Computer.getCoreCountBefore(c.parent) + c.getId();
                         int f = home.getCacheMatrix().GetLength(1);
 
-                        Console.WriteLine(" caches_matrix[ " + thisCore + ", " + dirBloque % f + "] = " + value);
+                        //Console.WriteLine(" caches_matrix[ " + thisCore + ", " + dirBloque % f + "] = " + value);
 
-                        if (home.getCacheMatrix()[thisCore, dirBloque % f] == value)
-                        {
-                            OperatingSystem.logError(" caches_matrix[ " + thisCore + ", " + dirBloque % f + "] is already" + value);
-                            Console.ReadLine();
-                        }
+                        // should never happen
+                        //if (home.getCacheMatrix()[thisCore, dirBloque % f] == value)
+                        //{
+                        //    OperatingSystem.logError(" caches_matrix[ " + thisCore + ", " + dirBloque % f + "] is already" + value);
+                        //    Console.ReadLine();
+                        //}
 
                         home.getCacheMatrix()[thisCore, dirBloque % f] = value;
                     }
@@ -545,7 +550,7 @@ namespace ProyectoArqui
                     {
                         if (_home_dir_.getCacheMatrix()[i, dirBloque % f] == true)
                         {
-                            OperatingSystem.log("Found Core with modif block on cache " + i);
+                            //OperatingSystem.log("Found Core with modif block on cache " + i);
                             if (i == 2)
                                 return Computer.processors[1].cores[i];
                             return Computer.processors[0].cores[i];
@@ -584,12 +589,12 @@ namespace ProyectoArqui
                             if (labelsOfWords[dirBloqueCache] == dirBloque &&
                                 statesOfWords[dirBloqueCache] != states.invalid) // hit
                             {
-                                Console.WriteLine("this is hit on load block " + dirBloque);
+                                //Console.WriteLine("this is hit on load block " + dirBloque);
                                 return data[dirBloqueCache].word[dirPalabra];
                             }
                             else // miss
                             {
-                                Console.WriteLine("this is miss on load block " + dirBloque);
+                                //Console.WriteLine("this is miss on load block " + dirBloque);
                                 if (miss(program_counter, c))
                                     return data[dirBloqueCache].word[dirPalabra];
                                 else return null;
@@ -619,7 +624,7 @@ namespace ProyectoArqui
                         //+40 or +16 (esta suma es cuando se inserta en memoria)
                         lock (thisCore.parent.shrmem)
                         {
-                            thisCore.parent.shrmem.insertBloque(dirBloque, data[dirBloqueCache]);
+                            thisCore.parent.shrmem.insertBloque(labelsOfWords[dirBloqueCache], data[dirBloqueCache]);
                         }
                         // Block the home directory of the victim block
                         // 5 o 1
@@ -663,7 +668,9 @@ namespace ProyectoArqui
 
 
                     DirectoryProc toFetchBlockDir = Computer.getHomeDirectory(dirBloque);
-                    OperatingSystem.log("Proc " + thisCore.parent.id + " dir LOAD block " + dirBloque + " >  BEFORE \n" + toFetchBlockDir.toString());
+
+                    if (OperatingSystem.slowModeActivated)
+                        OperatingSystem.log("Proc " + thisCore.parent.id + " dir LOAD block " + dirBloque + " >  BEFORE \n" + toFetchBlockDir.toString());
 
 
                     // Allocate
@@ -675,8 +682,6 @@ namespace ProyectoArqui
                         {
                             /*Bloquea la cache de datos que tenga el bloque*/
                             Core cacheOwner = GetCoreWithBlock(dirBloque, dirBloqueCache, toFetchBlockDir);
-                            OperatingSystem.log("trying to block cache on core " + cacheOwner.getId() + ":" + cacheOwner.getParentId() +
-                                " from core " + thisCore.getId() + ":" + thisCore.getParentId());
 
                             if (Monitor.TryEnter(cacheOwner.dataCache))
                             {
@@ -686,7 +691,10 @@ namespace ProyectoArqui
                                     lock (thisCore.parent.shrmem)
                                     {
                                         // revisar
-                                        thisCore.parent.shrmem.insertBloque(dirBloque, cacheOwner.dataCache.data[dirBloqueCache]);
+                                        thisCore.parent.shrmem.insertBloque(
+                                            cacheOwner.dataCache.labelsOfWords[dirBloqueCache],
+                                            cacheOwner.dataCache.data[dirBloqueCache]
+                                            );
                                     }
                                     /*Cambia el estado de bloque guardado a shared en la cache compartida */
                                     cacheOwner.dataCache.statesOfWords[dirBloqueCache] = states.shared;
@@ -716,7 +724,8 @@ namespace ProyectoArqui
                         setMatrixState(thisCore, dirBloque, true);
                         toFetchBlockDir.setState(dirBloque, DirectoryProc.dirStates.S);
                         //Console.WriteLine("set " + dirBloque + "on dir " + _home_.getParent().id);
-                        OperatingSystem.log("Proc " + thisCore.parent.id + " dir LOAD After \n" + toFetchBlockDir.toString());
+                        if (OperatingSystem.slowModeActivated)
+                            OperatingSystem.log("Proc " + thisCore.parent.id + " dir LOAD After \n" + toFetchBlockDir.toString());
                         return true;
                     }
                 }
@@ -742,7 +751,7 @@ namespace ProyectoArqui
                             // if the block is in this cache with state M
                             if (statesOfWords[dirBloqueCache] == states.modified) // store hit
                             {
-                                Console.WriteLine("this is hit on store block " + dirBloque);
+                                //Console.WriteLine("this is hit on store block " + dirBloque);
                                 //return data[dirBloqueCache].word[dirPalabra];
                                 data[dirBloqueCache].word[dirPalabra] = dato;
                                 statesOfWords[dirBloqueCache] = states.modified;
@@ -752,7 +761,7 @@ namespace ProyectoArqui
                             // if the block is in this cache with state S
                             else if (statesOfWords[dirBloqueCache] == states.shared) // store almost hit
                             {
-                                Console.WriteLine("this is hit on store block " + dirBloque + ", state Shared");
+                                //Console.WriteLine("this is hit on store block " + dirBloque + ", state Shared");
 
                                 // invalidate in all other caches
                                 Computer.invalidateBlockInOtherCaches(thisCore.parent.id, thisCore._coreId, dirBloqueCache, dirBloque);
@@ -772,7 +781,7 @@ namespace ProyectoArqui
                             }
                             else // invalid
                             {
-                                Console.WriteLine("this is miss on store block  + dirBloque");
+                                //Console.WriteLine("this is miss on store block  + dirBloque");
                                 if (missStore(program_counter, dato, thisCore))
                                 {
                                     statesOfWords[dirBloqueCache] = states.modified;
@@ -786,7 +795,7 @@ namespace ProyectoArqui
                         }
                         else // miss
                         {
-                            Console.WriteLine("this is miss on store block " + dirBloque);
+                            //Console.WriteLine("this is miss on store block " + dirBloque);
 
                             if (missStore(program_counter, dato, thisCore))
                             {
@@ -807,7 +816,9 @@ namespace ProyectoArqui
                     int dirBloqueCache = dirBloque % 4;
                     int dirPalabra = program_counter % (Computer.block_size * 4) / data.Length;
 
-                    // if the currently--in--this--cache block is modified,
+                    /* if the currently--in--this--cache block is modified,
+                     * we have to save it first before proceding with the store
+                     * */
                     if (statesOfWords[dirBloqueCache] == states.modified)
                     {
                         /* if the currently--in--this--cache block is modified, save it to mem first, 
@@ -846,8 +857,10 @@ namespace ProyectoArqui
                         DirectoryProc inCacheBlockDir = Computer.getHomeDirectory(labelsOfWords[dirBloqueCache]);
                         lock (inCacheBlockDir)
                         {
+                            // set as false in dir
                             setMatrixState(thisCore, labelsOfWords[dirBloqueCache], false);
 
+                            // if there are no more blocks shared, set dir state as U
                             if (!thisCore.isBlockOnAnotherCache(labelsOfWords[dirBloqueCache]))
                             {
                                 //solo debría hacerlo si esta compartido
@@ -858,7 +871,11 @@ namespace ProyectoArqui
 
 
                     DirectoryProc toFetchBlockDir = Computer.getHomeDirectory(dirBloque);
-                    OperatingSystem.log("Proc " + thisCore.parent.id + " dir STORE block " + dirBloque + " > BEFORE \n" + toFetchBlockDir.toString());
+
+                    if (OperatingSystem.slowModeActivated)
+                    {
+                        OperatingSystem.log("Proc " + thisCore.parent.id + " dir STORE block " + dirBloque + " > BEFORE \n" + toFetchBlockDir.toString());
+                    }
 
                     // Allocate
                     lock (toFetchBlockDir)
@@ -870,42 +887,43 @@ namespace ProyectoArqui
 
                             /*Bloquea la cache de datos que tenga el bloque*/
                             Core cacheOwner = GetCoreWithBlock(dirBloque, dirBloqueCache, toFetchBlockDir);
-                            OperatingSystem.log("trying to block cache on core " + cacheOwner.getId() + ":" + cacheOwner.getParentId() +
-                                " from core " + thisCore.getId() + ":" + thisCore.getParentId());
 
                             if (Monitor.TryEnter(cacheOwner.dataCache))
                             {
                                 try
                                 {
-
-                                    // if the block is modified in the remote cache
-                                    if (cacheOwner.dataCache.statesOfWords[dirBloqueCache] == states.modified)
+                                    if (cacheOwner.dataCache.statesOfWords[dirBloqueCache] != states.modified)
                                     {
-                                        /*Guarda el bloque desde la cache bloqueda a la mem compartida*/
-                                        lock (thisCore.parent.shrmem)
-                                        {
-                                            thisCore.parent.shrmem.insertBloque(dirBloque, cacheOwner.dataCache.data[dirBloqueCache]);
-                                        }
-                                        /*Guarda el bloque en mi cache*/
-                                        this.data[dirBloqueCache] = cacheOwner.dataCache.data[dirBloqueCache];
+                                        OperatingSystem.logError("Irregularity > block marked as M on dir, not M on cache");
+                                        Environment.Exit(7676767);
+                                    }
+                                    /*Guarda el bloque desde la cache bloqueda a la mem compartida*/
+                                    lock (thisCore.parent.shrmem)
+                                    {
+                                        thisCore.parent.shrmem.insertBloque(
+                                            cacheOwner.dataCache.labelsOfWords[dirBloqueCache],
+                                            cacheOwner.dataCache.data[dirBloqueCache]
+                                            );
+                                    }
+                                    /*Guarda el bloque en mi cache*/
+                                    this.data[dirBloqueCache] = cacheOwner.dataCache.data[dirBloqueCache];
 
-                                        /*Bloque de la otra cache lo marca invalido*/
-                                        cacheOwner.dataCache.statesOfWords[dirBloqueCache] = states.invalid;
-                                        // y actualiza el directorio correxpondiente 
-                                        setMatrixState(cacheOwner, cacheOwner.GetDataCache().labelsOfWords[dirBloqueCache], false);
+                                    /*Bloque de la otra cache lo marca invalido*/
+                                    cacheOwner.dataCache.statesOfWords[dirBloqueCache] = states.invalid;
+                                    // y actualiza el directorio correxpondiente 
+                                    setMatrixState(cacheOwner, cacheOwner.GetDataCache().labelsOfWords[dirBloqueCache], false);
 
-                                        // dado que estaba modificado, no deberia estar en ninguna otra cache
-                                        if (!thisCore.isBlockOnAnotherCache(dirBloque))
-                                        {
-                                            //Si el bloque no esta en otra cache, pone en U el estado de ese bloque en el directorio
-                                            toFetchBlockDir.setState(dirBloque, DirectoryProc.dirStates.U);
-                                        }
-                                        else
-                                        {
-                                            //Invalidacion
-                                            OperatingSystem.logError("ERROR: the block was on another cache");
-                                            Console.ReadLine();
-                                        }
+                                    // dado que estaba modificado, no deberia estar en ninguna otra cache
+                                    if (!thisCore.isBlockOnAnotherCache(dirBloque))
+                                    {
+                                        //Si el bloque no esta en otra cache, pone en U el estado de ese bloque en el directorio
+                                        toFetchBlockDir.setState(dirBloque, DirectoryProc.dirStates.U);
+                                    }
+                                    else
+                                    {
+                                        //Invalidacion
+                                        OperatingSystem.logError("ERROR: the block was on another cache");
+                                        Console.ReadLine();
                                     }
 
                                 }
@@ -930,18 +948,18 @@ namespace ProyectoArqui
 
                             // TODO esto es invalidar el bloque en todas, creo que no hace falta cacheOwnder 
                             Core cacheOwner = GetCoreWithBlock(dirBloque, dirBloqueCache, toFetchBlockDir);
-                            OperatingSystem.log("trying to block cache on core " + cacheOwner.getId() + " from core " + thisCore.getId());
 
                             /* si est'a compartido en otra(s) cache, invalidarlo */
                             //Computer.invalidateInOtherCaches( dirBloqueCache, dirBloque);
                             Computer.invalidateBlockInOtherCaches(cacheOwner.parent.id, cacheOwner._coreId, dirBloqueCache, dirBloque);
-                            OperatingSystem.log("Proc " + thisCore.parent.id + " dir STORE block " + dirBloque + " > invalidation \n" + toFetchBlockDir.toString());
+                            //OperatingSystem.log("Proc " + thisCore.parent.id + " dir STORE block " + dirBloque + " > invalidation \n" + toFetchBlockDir.toString());
                         }
 
                         /*guarda en mi cache el bloque desde memoria compartida*/
                         lock (thisCore.parent.shrmem)
                         {
                             data[dirBloqueCache] = thisCore.parent.shrmem.getBloque(dirBloque);
+                            data[dirBloqueCache].word[dirPalabra] = dato;
                             labelsOfWords[dirBloqueCache] = dirBloque;
                             statesOfWords[dirBloqueCache] = states.modified;
                         }
@@ -949,7 +967,8 @@ namespace ProyectoArqui
 
                         setMatrixState(thisCore, dirBloque, true);
                         toFetchBlockDir.setState(dirBloque, DirectoryProc.dirStates.M);
-                        OperatingSystem.log("Proc " + thisCore.parent.id + " dir STORE AFTER \n" + toFetchBlockDir.toString());
+                        if (OperatingSystem.slowModeActivated)
+                            OperatingSystem.log("Proc " + thisCore.parent.id + " dir STORE AFTER \n" + toFetchBlockDir.toString());
                         return true;
                     }
                 } // EO miss Store
