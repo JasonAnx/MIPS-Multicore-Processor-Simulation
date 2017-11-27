@@ -60,6 +60,30 @@ namespace ProyectoArqui
             {
                 Context ct = finishedTds.Dequeue();
                 s += ct.registersToString();
+                s += ct.clockTicksToString();
+            }
+            Console.WriteLine(s);
+        }
+
+        public void printDataCaches()
+        {
+            string s = "";
+            foreach (Core c in cores)
+            {
+                s += c.myDataCacheToString(c);
+            }
+            Console.WriteLine(s);
+        }
+
+        public void printSharedMem()
+        {
+            string s = "Shared Memory\nProcessor 0:\n";
+            for (int i = 0; i < Computer.p0_sharedmem_size+Computer.p1_sharedmem_size; i++) {
+                if (i == 16)
+                { s += "\nProcessor 1:\n"; }
+                if (i != 0 && i != 16 && i % 4 == 0)
+                { s += "\n"; }
+                s += "Block " + i + ": " + shrmem.getBloque(i).toString() + " ";
             }
             Console.WriteLine(s);
         }
@@ -127,15 +151,19 @@ namespace ProyectoArqui
             */
             public SharedMemory(int sizeMem, Processor prnt)
             {
+                int valueSh = 0;
+                if (OperatingSystem.valueShMem) {
+                    valueSh = 1;
+                }
                 parent = prnt;
                 shMem = new Bloque<int>[sizeMem];
                 for (int i = 0; i < sizeMem; i++)
                 {
                     shMem[i] = new Bloque<int>(Computer.block_size);
-                    shMem[i].word[0] = 0;
-                    shMem[i].word[1] = 0;
-                    shMem[i].word[2] = 0;
-                    shMem[i].word[3] = 0;
+                    shMem[i].word[0] = valueSh;
+                    shMem[i].word[1] = valueSh;
+                    shMem[i].word[2] = valueSh;
+                    shMem[i].word[3] = valueSh;
                 }
             }
 
@@ -156,6 +184,11 @@ namespace ProyectoArqui
             public Bloque<int>[] getShMem()
             {
                 return shMem;
+            }
+
+            public int getShMemLenght()
+            {
+                return shMem.Length;
             }
 
             public bool insertBloque(int numBloque, Bloque<int> block)
@@ -238,15 +271,42 @@ namespace ProyectoArqui
             // we used a partial class to define the class methods on another
             // file and so, keep this file shorter and more readable
 
-
+            int ticks;
             public int[] registers;
 
             public Core(int _id, Processor prnt)
             {
                 _coreId = _id;
                 parent = prnt;
+                ticks = 0;
                 instructionsCache = new InstructionCache();
                 dataCache = new DataCache();
+            }
+
+            public void addTicksForAccessDir(int dirParentId)
+            {
+                //si estoy acceso directorio propio
+                if (dirParentId == getParentId())
+                    this.ticks += 1;
+                //si acceso a un dir remoto
+                else {
+                    this.ticks += 5;
+                }
+            }
+
+            //Recibe el numero de bloque que va a ser escrito o leido desde memoria local o remota
+            //Necesita el id del procesador para saber si el acceso va a ser local o remoto
+            public void addTicksForAccessShMem(int procId, int numWriteBlock)
+            {
+                //si es memoria local
+                if (procId == 0 && numWriteBlock < Computer.p0_sharedmem_size ||
+                    procId == 1 && numWriteBlock >= Computer.p0_sharedmem_size)
+                    this.ticks += 16;
+                //si es memoria remota
+                else
+                {
+                    this.ticks += 40;
+                }
             }
 
             // Loads last Context in Context queue
@@ -327,6 +387,32 @@ namespace ProyectoArqui
             public DataCache GetDataCache()
             {
                 return this.dataCache;
+            }
+
+            public string myDataCacheToString(Core c)
+            {
+                string dataCache = "Data cache from processor "+c.getParentId()+ ", core "+ c.getId()+":\n";
+                for (int i = 0; i < 3; i++) {
+                    if (i == 0)
+                        { dataCache += "Labels: "; }
+                    if (i == 1)
+                        { dataCache += "Data  : "; }
+                    if (i == 2)
+                        { dataCache += "States: "; }
+                    for (int j = 0; j < cacheSize; j++)
+                    {
+                        if (i == 0)
+                            { dataCache += c.GetDataCache().labelsOfWords[j] + " "; }
+
+                        if (i == 1)
+                            { dataCache += "Block " + j + ": " + c.GetDataCache().data[j].toString() + " "; }
+
+                        if (i == 2)
+                            { dataCache += c.GetDataCache().statesOfWords[j] + " "; }
+                    }
+                    dataCache += "\n";
+                }
+                return dataCache;
             }
 
             // 
@@ -583,6 +669,7 @@ namespace ProyectoArqui
                     // Allocate
                     lock (toFetchBlockDir)
                     {
+                        // Se suman 5 o 1 en caso de que sea remote o local, respectivamente
                         // si está en otra cache, traerselo de ahí en vez de memoria
                         if (toFetchBlockDir.getStateOfBlock(dirBloque) == DirectoryProc.dirStates.M)
                         {
@@ -732,6 +819,7 @@ namespace ProyectoArqui
                         // 5 o 1
                         lock (inCacheBlockDir)
                         {
+                            // Se suman 5 o 1 en caso de que sea remote o local, respectivamente
                             //+40 or +16
                             lock (thisCore.parent.shrmem)
                             {

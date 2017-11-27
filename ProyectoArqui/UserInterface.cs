@@ -36,5 +36,21 @@ namespace ProyectoArqui
             }
             return userSlowMode;
         }
+
+        public bool getValueForShMem() {
+            string valueShMem = "";
+            bool valueforShMem = false; // Default value: 0
+            while (valueShMem != "Y" && valueShMem != "y" && valueShMem != "N" && valueShMem != "n")
+            {
+                Console.WriteLine("Shared Memory is initialized with 0's by default");
+                Console.WriteLine("Initialize Shared Memory with 1's ?  (Y/N):");
+                valueShMem = Console.ReadLine();
+                if (valueShMem == "Y" || valueShMem == "y")
+                {
+                    valueforShMem = true;
+                }
+            }
+            return valueforShMem;
+        }
     }
 }

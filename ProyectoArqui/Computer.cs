@@ -26,6 +26,7 @@ namespace ProyectoArqui
         static void Main(string[] args)
         {
             OperatingSystem.log("Booting");
+            OperatingSystem.valueShMem = userInterface.getValueForShMem();
             processors = new Processor[2];
             processors[0] = new Processor( /*id*/ 0,/*n_cores*/ 2, /*instmem_size*/ 24, /*sharedmem_size*/ p0_sharedmem_size);
             processors[1] = new Processor( /*id*/ 1,/*n_cores*/ 1, /*instmem_size*/ 16, /*sharedmem_size*/ p1_sharedmem_size);
@@ -36,6 +37,7 @@ namespace ProyectoArqui
             OperatingSystem.userQuantum = userInterface.getUserQuantum();
             OperatingSystem.log("Quantum set to " + OperatingSystem.userQuantum);
             OperatingSystem.slowModeActivated = userInterface.getSlowModeActivated();
+            
 
             // Sync Barrier
             bsync = new Barrier(getGlobalCoreCount(), (b) =>
@@ -75,6 +77,11 @@ namespace ProyectoArqui
             {
                 p.printArchivedContexts();
             }
+            foreach (Processor p in processors)
+            {
+                p.printDataCaches();
+            }
+            processors[0].printSharedMem();
             Console.ResetColor();
             OperatingSystem.log("Finished. Press any key to exit.");
             Console.ReadLine();

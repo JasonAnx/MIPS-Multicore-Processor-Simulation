@@ -8,6 +8,7 @@ namespace ProyectoArqui
     {
         public static uint userQuantum;
         public static bool slowModeActivated;
+        public static bool valueShMem;
 
         public static void allocateInstInMem()
         {
