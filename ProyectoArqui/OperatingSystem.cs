@@ -6,7 +6,7 @@ namespace ProyectoArqui
 
     class OperatingSystem
     {
-        public static int userQuantum;
+        public static uint userQuantum;
         public static bool slowModeActivated;
 
         public static void allocateInstInMem()
@@ -15,7 +15,7 @@ namespace ProyectoArqui
 
             if (programPath == null)
             {
-                logError("");
+                logError("Wrong program path specified");
                 Environment.Exit(66);
             }
 
@@ -68,11 +68,6 @@ namespace ProyectoArqui
                         //Console.WriteLine("An error occurred: '{0}'", e);
                     }
                 }
-                //Console.WriteLine(memoria.getBloque(5).word0.operation);
-                //Console.WriteLine("There's a total of " +
-                //    Computer.processors[numProcessor].contextQueue.Count +
-                //    " contexts on proc " + Computer.processors[numProcessor].id + " context queue"
-                //    );
             }
         }
 
@@ -116,6 +111,7 @@ namespace ProyectoArqui
             if (halt)
             {
                 Console.WriteLine("\tProgram Halted. Press any key to continue");
+                Environment.Exit(1);
             }
             else Console.ResetColor();
         }
