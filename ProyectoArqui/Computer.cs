@@ -164,14 +164,6 @@ namespace ProyectoArqui
 
 
         }
-<<<<<<< HEAD
-=======
-
-        public static int getClock()
-        {
-            return clock;
-        }
->>>>>>> c6328ca70db76530e90764ea6d7b641fafc3d1c9
     }
 
 }
