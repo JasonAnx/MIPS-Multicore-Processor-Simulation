@@ -161,6 +161,10 @@ namespace ProyectoArqui
 
 
         }
+
+        public static int getClock() {
+            return clock;
+        }
     }
 
 }
