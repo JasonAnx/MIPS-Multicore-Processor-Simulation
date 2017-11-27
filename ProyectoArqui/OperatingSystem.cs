@@ -110,7 +110,7 @@ namespace ProyectoArqui
             Console.WriteLine("[OS Message]: " + s);
             if (halt)
             {
-                Console.WriteLine("\tProgram Halted. Press any key to exit");
+                Console.WriteLine("\tProgram Halted. Press any key to continue");
             }
             else Console.ResetColor();
         }

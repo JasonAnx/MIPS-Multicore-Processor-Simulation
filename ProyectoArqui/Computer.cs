@@ -144,7 +144,7 @@ namespace ProyectoArqui
 
         /*Recibe el ID del procesador y el ID la cache desde la cual se va a 
          * tratar de invalidar al resto de caches y el bloque que se quiere invalidar*/
-        public static void invalidateInOtherCaches(int myProc, int myCache, int dirBloqueCache, int dirBloque)
+        public static void invalidateBlockInOtherCaches(int myProc, int myCache, int dirBloqueCache, int dirBloque)
         {
 
             foreach (Processor p in processors)
