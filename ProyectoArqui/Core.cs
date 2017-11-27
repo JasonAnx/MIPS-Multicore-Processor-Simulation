@@ -33,6 +33,7 @@ namespace ProyectoArqui
                     int cycles = -1;
                     while (cycles++ < OperatingSystem.userQuantum && !currentContext.isFinalized)
                     {
+                        ticks = 0;
                         Instruction nxtIst =
                             instructionsCache.fetchInstruction(
                                 currentContext.instruction_pointer,
@@ -50,7 +51,10 @@ namespace ProyectoArqui
                         Computer.bsync.SignalAndWait();
                     }
                     if (!currentContext.isFinalized)
+                    {
+                        currentContext.addClockTicks(ticks);
                         saveCurrentContext();
+                    }
                 }
                 {
                     Computer.bsync.RemoveParticipant();
@@ -86,7 +90,8 @@ namespace ProyectoArqui
                         this.currentContext.id,
                         currentThreadExecutionTime,
                         registerValues,
-                        this.currentContext.isFinalized
+                        this.currentContext.isFinalized,
+                        this.currentContext.clockTicks
                         );
                     parent.contextQueue.Enqueue(currentContext);
 

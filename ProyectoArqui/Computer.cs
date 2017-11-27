@@ -75,6 +75,11 @@ namespace ProyectoArqui
             {
                 p.printArchivedContexts();
             }
+            foreach (Processor p in processors)
+            {
+                p.printDataCaches();
+            }
+            processors[0].printSharedMem();
             Console.ResetColor();
             OperatingSystem.log("Finished. Press any key to exit.");
             Console.ReadLine();

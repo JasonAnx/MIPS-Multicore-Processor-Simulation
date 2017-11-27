@@ -41,6 +41,16 @@ namespace ProyectoArqui
                 word[i] = bl.word[i];
             }
         }
+
+        public string toString()
+        {
+            string s = "|";
+            for (int i = 0; i < word.Length; i++)
+            {
+                s += word[i] + "|";
+            }
+            return s;
+        }
     }
 
     public struct Instruction
@@ -87,19 +97,22 @@ namespace ProyectoArqui
 
         float threadExecutionTime;
 
+        public int clockTicks;
+
         private int[] registerValues; //> Current thread register values 
 
         bool threadIsFinalized;
         public bool isFinalized { get { return threadIsFinalized; } set { threadIsFinalized = value; } }
 
         //
-        public Context(int instr_ptr, string threadId, float threadExecutionTime, int[] registerValues, bool threadIsFinalized)
+        public Context(int instr_ptr, string threadId, float threadExecutionTime, int[] registerValues, bool threadIsFinalized, int clockTicks)
         {
             this.ctxId = threadId;
             this.threadExecutionTime = threadExecutionTime;
             this.registerValues = registerValues;
             this.threadIsFinalized = threadIsFinalized;
             this.instruction_pointer = instr_ptr;
+            this.clockTicks = clockTicks;
         }
 
         public Context(int instr_ptr, string threadId)
@@ -109,6 +122,7 @@ namespace ProyectoArqui
             threadExecutionTime = 0;
             registerValues = new int[32];
             this.threadIsFinalized = false;
+            clockTicks = 0;
         }
 
         public int[] getRegisterValues() { return registerValues; }
@@ -130,6 +144,18 @@ namespace ProyectoArqui
             }
             r += "\n";
             return r;
+        }
+
+        public string clockTicksToString()
+        {
+            string s = "Clock ticks of " + ctxId + ": ";
+            s += clockTicks;
+            s += "\n";
+            return s;
+        }
+
+        public void addClockTicks(int ticks) {
+            clockTicks += ticks;
         }
     }
 

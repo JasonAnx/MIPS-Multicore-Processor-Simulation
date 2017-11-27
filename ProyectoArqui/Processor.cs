@@ -60,6 +60,30 @@ namespace ProyectoArqui
             {
                 Context ct = finishedTds.Dequeue();
                 s += ct.registersToString();
+                s += ct.clockTicksToString();
+            }
+            Console.WriteLine(s);
+        }
+
+        public void printDataCaches()
+        {
+            string s = "";
+            foreach (Core c in cores)
+            {
+                s += c.myDataCacheToString(c);
+            }
+            Console.WriteLine(s);
+        }
+
+        public void printSharedMem()
+        {
+            string s = "Shared Memory\nProcessor 0:\n";
+            for (int i = 0; i < Computer.p0_sharedmem_size+Computer.p1_sharedmem_size; i++) {
+                if (i == 16)
+                { s += "\nProcessor 1:\n"; }
+                if (i != 0 && i != 16 && i % 4 == 0)
+                { s += "\n"; }
+                s += "Block " + i + ": " + shrmem.getBloque(i).toString() + " ";
             }
             Console.WriteLine(s);
         }
@@ -158,6 +182,11 @@ namespace ProyectoArqui
                 return shMem;
             }
 
+            public int getShMemLenght()
+            {
+                return shMem.Length;
+            }
+
             public bool insertBloque(int numBloque, Bloque<int> block)
             {
                 bool inserted = false;
@@ -238,15 +267,42 @@ namespace ProyectoArqui
             // we used a partial class to define the class methods on another
             // file and so, keep this file shorter and more readable
 
-
+            int ticks;
             public int[] registers;
 
             public Core(int _id, Processor prnt)
             {
                 _coreId = _id;
                 parent = prnt;
+                ticks = 0;
                 instructionsCache = new InstructionCache();
                 dataCache = new DataCache();
+            }
+
+            public void addTicksForAccessDir(int dirParentId)
+            {
+                //si estoy acceso directorio propio
+                if (dirParentId == getParentId())
+                    this.ticks += 1;
+                //si acceso a un dir remoto
+                else {
+                    this.ticks += 5;
+                }
+            }
+
+            //Recibe el numero de bloque que va a ser escrito o leido desde memoria local o remota
+            //Necesita el id del procesador para saber si el acceso va a ser local o remoto
+            public void addTicksForAccessShMem(int procId, int numWriteBlock)
+            {
+                //si es memoria local
+                if (procId == 0 && numWriteBlock < Computer.p0_sharedmem_size ||
+                    procId == 1 && numWriteBlock >= Computer.p0_sharedmem_size)
+                    this.ticks += 16;
+                //si es memoria remota
+                else
+                {
+                    this.ticks += 40;
+                }
             }
 
             // Loads last Context in Context queue
@@ -351,6 +407,32 @@ namespace ProyectoArqui
                 return this.dataCache;
             }
 
+            public string myDataCacheToString(Core c)
+            {
+                string dataCache = "Data cache from processor "+c.getParentId()+ ", core "+ c.getId()+":\n";
+                for (int i = 0; i < 3; i++) {
+                    if (i == 0)
+                        { dataCache += "Labels: "; }
+                    if (i == 1)
+                        { dataCache += "Data  : "; }
+                    if (i == 2)
+                        { dataCache += "States: "; }
+                    for (int j = 0; j < cacheSize; j++)
+                    {
+                        if (i == 0)
+                            { dataCache += c.GetDataCache().labelsOfWords[j] + " "; }
+
+                        if (i == 1)
+                            { dataCache += "Block " + j + ": " + c.GetDataCache().data[j].toString() + " "; }
+
+                        if (i == 2)
+                            { dataCache += c.GetDataCache().statesOfWords[j] + " "; }
+                    }
+                    dataCache += "\n";
+                }
+                return dataCache;
+            }
+
             // 
             public class InstructionCache
             {
@@ -439,6 +521,7 @@ namespace ProyectoArqui
                     }
                 } // EO constructor
 
+
                 public DataCache getDataCache(int i)
                 {
                     if (i >= 2)
@@ -520,16 +603,19 @@ namespace ProyectoArqui
                     // save the currently-in-this-cache block if its modified
                     if (statesOfWords[dirBloqueCache] == states.modified)
                     {
-                        //+40 or +16 (esta suma es cuando se inserta en memoria)
+                        
                         lock (c.parent.shrmem)
                         {
+                            //+40 o +16 cuando se inserta o se trae de memoria, 16 si es local, 40 si es remota 
+                            c.addTicksForAccessShMem(c.getParentId(), dirBloque);
                             c.parent.shrmem.insertBloque(dirBloque, data[dirBloqueCache]);
                         }
                         // Block the home directory of the victim block
-                        // 5 o 1
+                        
                         lock (_home_dir_)
                         {
-
+                            // Se suman 5 o 1 en caso de que sea remote o local, respectivamente
+                            c.addTicksForAccessDir(_home_dir_.getParent().id);
                             // ponerlo en 0 en el dir
                             c.setMatrixState(c, dirBloque, false);
 
@@ -560,6 +646,8 @@ namespace ProyectoArqui
                     // Allocate
                     lock (_home_dir_)
                     {
+                        // Se suman 5 o 1 en caso de que sea remote o local, respectivamente
+                        c.addTicksForAccessDir(_home_dir_.getParent().id);
                         // si está en otra cache, traerselo de ahí en vez de memoria
                         if (_home_dir_.getStateOfBlock(dirBloque) == DirectoryProc.dirStates.M)
                         {
@@ -571,6 +659,8 @@ namespace ProyectoArqui
                                 /*Guarda el bloque desde la cache bloqueda a la mem compartida */
                                 lock (c.parent.shrmem)
                                 {
+                                    //+40 o +16 cuando se inserta o se trae de memoria, 16 si es local, 40 si es remota 
+                                    c.addTicksForAccessShMem(c.getParentId(), dirBloque);
                                     // revisar
                                     c.parent.shrmem.insertBloque(dirBloque, HomeCache.data[dirBloqueCache]);
                                 }
@@ -586,6 +676,9 @@ namespace ProyectoArqui
                         // 
                         lock (c.parent.shrmem)
                         {
+                            //+40 o +16 cuando se inserta o se trae de memoria, 16 si es local, 40 si es remota 
+                            c.addTicksForAccessShMem(c.getParentId(), dirBloque);
+
                             data[dirBloqueCache] = c.parent.shrmem.getBloque(dirBloque);
                             labelsOfWords[dirBloqueCache] = dirBloque;
                             statesOfWords[dirBloqueCache] = states.shared;
@@ -688,9 +781,14 @@ namespace ProyectoArqui
                         // 5 o 1
                         lock (_home_dir_)
                         {
+                            // Se suman 5 o 1 en caso de que sea remote o local, respectivamente
+                            c.addTicksForAccessDir(_home_dir_.getParent().id);
                             //+40 or +16
                             lock (c.parent.shrmem)
                             {
+                                //+40 o +16 cuando se inserta o se trae de memoria, 16 si es local, 40 si es remota 
+                                c.addTicksForAccessShMem(c.getParentId(), dirBloque);
+
                                 c.parent.shrmem.insertBloque(dirBloque, data[dirBloqueCache]);
                             }
 
@@ -713,6 +811,9 @@ namespace ProyectoArqui
                         OperatingSystem.logError("shared on missStore");
                         lock (_home_dir_)
                         {
+                            // Se suman 5 o 1 en caso de que sea remote o local, respectivamente
+                            c.addTicksForAccessDir(_home_dir_.getParent().id);
+
                             c.setMatrixState(c, labelsOfWords[dirBloqueCache], false);
 
                             if (!c.isBlockOnAnotherCache(dirBloque))
@@ -740,6 +841,9 @@ namespace ProyectoArqui
                                     /*Guarda el bloque desde la cache bloqueda a la mem compartida*/
                                     lock (c.parent.shrmem)
                                     {
+                                        //+40 o +16 cuando se inserta o se trae de memoria, 16 si es local, 40 si es remota 
+                                        c.addTicksForAccessShMem(c.getParentId(), dirBloque);
+
                                         c.parent.shrmem.insertBloque(dirBloque, datahome.data[dirBloqueCache]);
                                     }
                                     /*Guarda el bloque en mi cache*/
@@ -779,6 +883,9 @@ namespace ProyectoArqui
                         /*guarda en mi cache el bloque desde memoria compartida*/
                         lock (c.parent.shrmem)
                         {
+                            //+40 o +16 cuando se inserta o se trae de memoria, 16 si es local, 40 si es remota 
+                            c.addTicksForAccessShMem(c.getParentId(), dirBloque);
+
                             data[dirBloqueCache] = c.parent.shrmem.getBloque(dirBloque);
                             labelsOfWords[dirBloqueCache] = dirBloque;
                             statesOfWords[dirBloqueCache] = states.modified;
