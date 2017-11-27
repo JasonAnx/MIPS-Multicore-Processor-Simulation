@@ -46,7 +46,7 @@ namespace ProyectoArqui
                     }
                     if (!currentContext.isFinalized)
                     {
-                        currentContext.addClockTicks(ticks);
+                        currentContext.addClockTicks(this.ticks);
                         saveCurrentContext();
                     }
                 }
@@ -110,30 +110,41 @@ namespace ProyectoArqui
                     /***** OPERACIONES ARITMETICAS BASICAS *****/
                     case 8:
                         registers[sr2] = registers[src] + imm;
+                        addTicks();
                         break;
                     case 32:
                         registers[imm] = registers[src] + registers[sr2];
+                        addTicks();
                         break;
 
                     case 34:
                         registers[imm] = registers[src] - registers[sr2];
+                        addTicks();
                         break;
 
                     case 12:
                         registers[imm] = registers[src] * registers[sr2];
+                        addTicks();
                         break;
 
                     case 14:
                         registers[imm] = registers[src] / registers[sr2];
+                        addTicks();
                         break;
                     /**** LOADS Y STORES ******/
 
                     case 35: //LW
 
-
+                        Computer.processors[0].printDataCaches();
+                        Computer.processors[1].printDataCaches();
+                        Computer.processors[0].printSharedMem();
                         int memoryAddress = imm + registers[src];
 
                         int? datoLoad = dataCache.fetchData(memoryAddress, this);
+
+                        Computer.processors[0].printDataCaches();
+                        Computer.processors[1].printDataCaches();
+                        Computer.processors[0].printSharedMem();
                         /*   -->  
                          *   datoLoad =
                             traer de cacheDatos (  memoryAddress % 4, memoryAddress / 16 );

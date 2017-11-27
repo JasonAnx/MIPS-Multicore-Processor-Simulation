@@ -45,7 +45,7 @@ namespace ProyectoArqui
         public string toString()
         {
             string s = "|";
-            for (int i = 0; i < word.Length; i++)
+            for (int i = 0; i < Computer.block_size; i++)
             {
                 s += word[i] + "|";
             }
