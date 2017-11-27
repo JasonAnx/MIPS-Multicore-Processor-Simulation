@@ -80,6 +80,7 @@ namespace ProyectoArqui
             foreach (Processor p in processors)
             {
                 p.printDataCaches();
+                OperatingSystem.log("Directory of proc " + p.id + " \n" + p.dir.toString());
             }
             processors[0].printSharedMem();
             Console.ResetColor();
@@ -160,7 +161,8 @@ namespace ProyectoArqui
 
         }
 
-        public static int getClock() {
+        public static int getClock()
+        {
             return clock;
         }
     }

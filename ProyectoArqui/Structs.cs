@@ -95,8 +95,6 @@ namespace ProyectoArqui
 
         public int instruction_pointer;
 
-        float threadExecutionTime;
-
         public int clockTicks;
 
         private int[] registerValues; //> Current thread register values 
@@ -105,10 +103,9 @@ namespace ProyectoArqui
         public bool isFinalized { get { return threadIsFinalized; } set { threadIsFinalized = value; } }
 
         //
-        public Context(int instr_ptr, string threadId, float threadExecutionTime, int[] registerValues, bool threadIsFinalized, int clockTicks)
+        public Context(int instr_ptr, string threadId, int[] registerValues, bool threadIsFinalized, int clockTicks)
         {
             this.ctxId = threadId;
-            this.threadExecutionTime = threadExecutionTime;
             this.registerValues = registerValues;
             this.threadIsFinalized = threadIsFinalized;
             this.instruction_pointer = instr_ptr;
@@ -119,7 +116,6 @@ namespace ProyectoArqui
         {
             instruction_pointer = instr_ptr;
             this.ctxId = threadId;
-            threadExecutionTime = 0;
             registerValues = new int[32];
             this.threadIsFinalized = false;
             clockTicks = 0;
@@ -148,7 +144,7 @@ namespace ProyectoArqui
 
         public string clockTicksToString()
         {
-            string s = "Clock ticks of " + ctxId + ": ";
+            string s = "\tClock ticks of " + ctxId + ": ";
             s += clockTicks;
             s += "\n";
             return s;

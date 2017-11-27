@@ -77,14 +77,15 @@ namespace ProyectoArqui
 
         public void printSharedMem()
         {
-            string s = "Shared Memory\nProcessor 0:\n";
+            OperatingSystem.log("Shared Memory");
+            string s = "\nProcessor 0:\n";
             for (int i = 0; i < Computer.p0_sharedmem_size + Computer.p1_sharedmem_size; i++)
             {
                 if (i == 16)
                 { s += "\nProcessor 1:\n"; }
                 if (i != 0 && i != 16 && i % 4 == 0)
                 { s += "\n"; }
-                s += "Block " + i + ": " + shrmem.getBloque(i).toString() + " ";
+                s += "Block " + i + ": " + shrmem.getBloque(i).toString() + "\t";
             }
             Console.WriteLine(s);
         }
@@ -273,32 +274,25 @@ namespace ProyectoArqui
             // we used a partial class to define the class methods on another
             // file and so, keep this file shorter and more readable
 
-            int ticks;
             public int[] registers;
 
             public Core(int _id, Processor prnt)
             {
                 _coreId = _id;
                 parent = prnt;
-                ticks = 0;
                 instructionsCache = new InstructionCache();
                 dataCache = new DataCache();
-            }
-
-            public void addTicks()
-            {
-                this.ticks += 1;
             }
 
             public void addTicksForAccessDir(int dirParentId)
             {
                 //si estoy acceso directorio propio
                 if (dirParentId == getParentId())
-                    this.ticks += 1;
+                    this.currentContext.addClockTicks(1);
                 //si acceso a un dir remoto
                 else
                 {
-                    this.ticks += 5;
+                    this.currentContext.addClockTicks(5);
                 }
             }
 
@@ -309,11 +303,11 @@ namespace ProyectoArqui
                 //si es memoria local
                 if (getParentId() == 0 && numWriteBlock < Computer.p0_sharedmem_size ||
                     getParentId() == 1 && numWriteBlock >= Computer.p0_sharedmem_size)
-                    this.ticks += 16;
+                    this.currentContext.addClockTicks(16);
                 //si es memoria remota
                 else
                 {
-                    this.ticks += 40;
+                    this.currentContext.addClockTicks(40);
                 }
             }
 
@@ -398,7 +392,7 @@ namespace ProyectoArqui
 
             public string myDataCacheToString(Core c)
             {
-                string dataCache = "Data cache from processor " + c.getParentId() + ", core " + c.getId() + ":\n";
+                string dataCache = "\nData cache from processor " + c.getParentId() + ", core " + c.getId() + ":\n";
                 for (int i = 0; i < 3; i++)
                 {
                     if (i == 0)
@@ -592,7 +586,7 @@ namespace ProyectoArqui
                             if (labelsOfWords[dirBloqueCache] == dirBloque &&
                                 statesOfWords[dirBloqueCache] != states.invalid) // hit
                             {
-                                c.addTicks();
+                                c.currentContext.addClockTicks(1);
                                 //Console.WriteLine("this is hit on load block " + dirBloque);
                                 return data[dirBloqueCache].word[dirPalabra];
                             }
@@ -768,7 +762,7 @@ namespace ProyectoArqui
                                 //return data[dirBloqueCache].word[dirPalabra];
                                 data[dirBloqueCache].word[dirPalabra] = dato;
                                 statesOfWords[dirBloqueCache] = states.modified;
-                                thisCore.addTicks();
+                                thisCore.currentContext.addClockTicks(1);
                                 stored = true;
                                 return stored;
                             }
@@ -791,7 +785,7 @@ namespace ProyectoArqui
                                     setMatrixState(thisCore, dirBloque, true);
                                     _home_dir_.setState(dirBloque, DirectoryProc.dirStates.M);
                                 }
-                                thisCore.addTicks();
+                                thisCore.currentContext.addClockTicks(1);
                                 stored = true;
                                 return stored;
                             }
