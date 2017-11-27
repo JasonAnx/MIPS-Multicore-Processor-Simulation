@@ -417,17 +417,17 @@ namespace ProyectoArqui
                     }
                 } // EO constructor
 
-                public DataCache getDataCache(int i)
-                {
-                    if (i >= 2)
-                    {
-                        return Computer.processors[1].cores[0].dataCache;
-                    }
-                    else
-                    {
-                        return Computer.processors[0].cores[i].dataCache;
-                    }
-                }
+                //public DataCache getDataCache(int i)
+                //{
+                //    if (i >= 2)
+                //    {
+                //        return Computer.processors[1].cores[0].dataCache;
+                //    }
+                //    else
+                //    {
+                //        return Computer.processors[0].cores[i].dataCache;
+                //    }
+                //}
 
                 // Set specific matrix position to true
                 public void setMatrixState(Core c, int dirBloque, bool value)
@@ -540,31 +540,31 @@ namespace ProyectoArqui
                         lock (inCacheBlockDir)
                         {
                             // ponerlo en 0 en el dir
-                            setMatrixState(thisCore, dirBloque, false);
+                            setMatrixState(thisCore, labelsOfWords[dirBloqueCache], false);
 
                             //Si el bloque no esta en otra cache, pone en U el estado de ese bloque en el directorio
-                            if (thisCore.isBlockOnAnotherCache(dirBloque))
+                            if (thisCore.isBlockOnAnotherCache(labelsOfWords[dirBloqueCache]))
                             {
                                 // siempre deberia anular
                                 OperatingSystem.logError("block should not be in another cache");
                                 Environment.Exit(3456);
                             }
-                            inCacheBlockDir.setState(dirBloque, DirectoryProc.dirStates.U);
+                            inCacheBlockDir.setState(labelsOfWords[dirBloqueCache], DirectoryProc.dirStates.U);
                         }
                     }
                     // si solo esta compartirdo, se pone 0 en dir y u si no hay mas
                     else if (statesOfWords[dirBloqueCache] == states.shared)
                     {
-                        OperatingSystem.logError("shared code 639");
+                        //OperatingSystem.logError("shared code 639");
 
                         DirectoryProc inCacheBlockDir = Computer.getHomeDirectory(labelsOfWords[dirBloqueCache]);
                         //Environment.Exit(33);
                         lock (inCacheBlockDir)
                         {
-                            setMatrixState(thisCore, dirBloque, false);
-                            if (!thisCore.isBlockOnAnotherCache(dirBloque))
+                            setMatrixState(thisCore, labelsOfWords[dirBloqueCache], false);
+                            if (!thisCore.isBlockOnAnotherCache(labelsOfWords[dirBloqueCache]))
                             {
-                                inCacheBlockDir.setState(dirBloque, DirectoryProc.dirStates.U);
+                                inCacheBlockDir.setState(labelsOfWords[dirBloqueCache], DirectoryProc.dirStates.U);
                             }
                         }
 
@@ -735,14 +735,14 @@ namespace ProyectoArqui
                             //+40 or +16
                             lock (thisCore.parent.shrmem)
                             {
-                                thisCore.parent.shrmem.insertBloque(dirBloque, data[dirBloqueCache]);
+                                thisCore.parent.shrmem.insertBloque(labelsOfWords[dirBloqueCache], data[dirBloqueCache]);
                             }
 
                             //pone false en la posicion de la cache en el directorio
                             setMatrixState(thisCore, labelsOfWords[dirBloqueCache], false);
 
                             //Si el bloque no esta en otra cache, pone en U el estado de ese bloque en el directorio
-                            if (!thisCore.isBlockOnAnotherCache(dirBloque))
+                            if (!thisCore.isBlockOnAnotherCache(labelsOfWords[dirBloqueCache]))
                             {
                                 //solo debría hacerlo si esta compartido
                                 inCacheBlockDir.setState(labelsOfWords[dirBloqueCache], DirectoryProc.dirStates.U);
@@ -756,16 +756,11 @@ namespace ProyectoArqui
                     else if (statesOfWords[dirBloqueCache] == states.shared)
                     {
                         DirectoryProc inCacheBlockDir = Computer.getHomeDirectory(labelsOfWords[dirBloqueCache]);
-                        OperatingSystem.logError("shared on missStore");
                         lock (inCacheBlockDir)
                         {
-                            if (dirBloque != labelsOfWords[dirBloqueCache])
-                            {
-                                OperatingSystem.logError("this error lmao", true);
-                            }
                             setMatrixState(thisCore, labelsOfWords[dirBloqueCache], false);
 
-                            if (!thisCore.isBlockOnAnotherCache(dirBloque))
+                            if (!thisCore.isBlockOnAnotherCache(labelsOfWords[dirBloqueCache]))
                             {
                                 //solo debría hacerlo si esta compartido
                                 inCacheBlockDir.setState(labelsOfWords[dirBloqueCache], DirectoryProc.dirStates.U);
@@ -837,11 +832,15 @@ namespace ProyectoArqui
                             }
 
                         }
+                        /* si el bloque que se quiere escribir esta compartido en otra(s) cache(s)
+                         * hay que invalidar todas sus ocurrencias
+                         */
                         else if (toFetchBlockDir.getStateOfBlock(dirBloque) == DirectoryProc.dirStates.S)
                         {
-                            OperatingSystem.logError("Implement this");
-                            Console.ReadLine();
+                            //OperatingSystem.logError("Implement this");
+                            //Console.ReadLine();
 
+                            // TODO esto es invalidar el bloque en todas, creo que no hace falta cacheOwnder 
                             Core cacheOwner = GetCoreWithBlock(dirBloque, dirBloqueCache, toFetchBlockDir);
                             OperatingSystem.log("trying to block cache on core " + cacheOwner.getId() + " from core " + thisCore.getId());
 
